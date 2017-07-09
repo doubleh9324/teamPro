@@ -43,7 +43,6 @@ public class PlaceInsertAction implements Action{
 			forward.setRedirect(true);
 			
 			forward.setPath("index.jsp");
-			System.out.println("???");
 			return forward;
 		}
 

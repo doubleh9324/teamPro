@@ -21,6 +21,7 @@ public class PlaceListSelectAction implements Action{
 		ActionForward forward=new ActionForward();
 		forward.setRedirect(false);
 		forward.setPath("./placelist.jsp");
+		
 		return forward;
 	}
 	

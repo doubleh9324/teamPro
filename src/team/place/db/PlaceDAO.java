@@ -118,11 +118,102 @@ public class PlaceDAO {
 		pb.setP_code(rs.getString("p_code"));
 		pb.setName(rs.getString("name"));
 		pb.setScreen_name(rs.getString("screen_name"));
-		pb.setAddress(rs.getString("capacity"));
+		pb.setCapacity(rs.getShort("capacity"));
+		pb.setAddress(rs.getString("address"));
 		pb.setContact_num(rs.getString("contact_num"));
 		pb.setHomepage(rs.getString("homepage"));
 		
 		return pb;
 	}
+	
+	public boolean insertLocation(LocationBean lb){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		int result=0;
+		try{
+			con=getConnection();
+			
+			sql="insert into Location values (?,?)";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, lb.getL_code());
+			pstmt.setString(2, lb.getLocation());
+			result = pstmt.executeUpdate();
+			
+			if(result!=0){
+				return true;
+			}
+		}catch(Exception e){
+			System.out.println("insertLocation error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return false;
+	}
+	
+	public List<LocationBean> selectL_codeList(){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		try{
+			con=getConnection();
+			
+			sql="select * from Location";
+			pstmt=con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+				List<LocationBean> l_codeList = new ArrayList<>();
+
+				do{
+					LocationBean lb = new LocationBean();
+					
+					lb.setL_code(rs.getString("l_code"));
+					lb.setLocation(rs.getString("location"));
+					l_codeList.add(lb);
+				}while(rs.next());
+				
+				return l_codeList;
+			}else {
+			return Collections.emptyList();
+			}
+		}catch(Exception e){
+			System.out.println("PlaceDAO selectL_codeList error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		
+	return Collections.emptyList();
+	}
+	
+	public int getPlaceMaxCount() throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		
+		try{
+			con=getConnection();
+			
+			sql="select max(substring(p_code, 3, 4)*1) from place";
+			pstmt=con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+				return rs.getInt(1);
+			
+		}catch(Exception e){
+			System.out.println("PlaceDAO selectPlaceMax error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		
+		return 0;
+	}
+	
 	
 }

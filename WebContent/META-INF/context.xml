@@ -8,7 +8,7 @@
 	driverClassName="com.mysql.jdbc.Driver"
 	url="jdbc:mysql://localhost:3306/team"
 	username="team"
-	password="121524"	
+	password="pw"	
 	/>
 
 </Context>

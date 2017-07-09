@@ -44,16 +44,38 @@ public class PlaceFrontController extends HttpServlet{
 		
 		Action action = null;
 		
-		if(command.equals("/PlaceInsertAction.pl")){
-			System.out.println("확인");
+		if(command.equals("/getIndexSetInfo.pl")){
+		//	action = new LocationSelectAction();
+			action = new IndexSetInfoSelecAction();
+			//request.setAttribute("setFlag", "y");
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/PlaceInsertAction.pl")){
+			//영화관 추가
 			action = new PlaceInsertAction();
 			try {
 				forward= action.execute(request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else if(command.equals("/getPlaceList.pl")){
-	//		action = new PlaceListSelectAction();
+		}else if(command.equals("/LocationInsertAction.pl")){
+			//지역코드 추가
+			action = new LocationInsertAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/PlaceListSelectAction.pl")){
+			action = new PlaceListSelectAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		if(forward!=null){//new ActionForward()��ü�� �����ϰ�...
