@@ -26,6 +26,16 @@
     <url-pattern>*.pl</url-pattern>
   </servlet-mapping>
   
+    
+<servlet>
+    <servlet-name>PlayingFrontController</servlet-name>
+    <servlet-class>team.playing.action.PlayingFrontController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PlayingFrontController</servlet-name>
+    <url-pattern>*.pg</url-pattern>
+  </servlet-mapping>
+  
   
   <servlet>
   	<servlet-name>MovieFrontController</servlet-name>

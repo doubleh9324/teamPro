@@ -8,10 +8,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Insert page</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="//cdn.rawgit.com/fgelinas/timepicker/master/jquery.ui.timepicker.css">
 </head>
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="//code.jquery.com/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src='//cdn.rawgit.com/fgelinas/timepicker/master/jquery.ui.timepicker.js'></script>
 
+<!-- import 파일 정리 할 것 -->
 영화
 	<form action="./MovieInsertAction.mo" method="post">
 
@@ -117,6 +123,40 @@
 		<button>추가</button>
 		
 		</form>
+		
+		상영영화 추가
+		<form action="./PlayingInsertAction.pg" method="post">
+			<table>
+				<thead>
+					<tr>
+						<th>ping_num</th>
+						<th>p_code</th>
+						<th>nc_code</th>
+						<th>시작일</th>
+						<th>종료일</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" id="ping_num" name="ping_num" value="${pnumMax }"></td>
+						<td><input type="text" name="p_code" onclick="searchPlace()"></td>
+						<td><input type="text" name="nc_code"></td>
+						<td><input type="text" name="start_day" id="start_day"></td>
+						<td><input type="text" name="end_day" id="end_day"></td>
+					</tr>
+					<tr>
+						<th>회차</th>
+						<td colspan="4">
+						<input type="text" name="time" class="time">
+						<input type="text" name="time" class="time">
+						<input type="text" name="time" class="time">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		<button>추가</button>
+		
+		</form>
 	
 <script type="text/javascript">
 
@@ -152,7 +192,22 @@ $(document).ready(function(){
 	    		repnum = zero+pnum.val();
 	    		$("#p_code").val( $("#l_code option:selected").val() + zero + pnum.val() + $("#p_th option:selected").val());
 
-               
+         },
+         complete : function(data) {
+               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
+               // TODO
+         },
+         error : function(xhr, status, error) {
+               alert("에러발생");
+         }
+  	 });
+	
+	 jQuery.ajax({
+         type:"POST",
+         url:"./getIndexSetInfo.pg",
+         dataType:"JSON",
+         success : function(data) {
+	    		$("#ping_num").val(data.pnumMax);
          },
          complete : function(data) {
                // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
@@ -196,6 +251,28 @@ function setp_code(value, s){
 	
 }
 
+
+$(function() {
+    $('.time').timepicker();
+});
+
+$( "#start_day" ).datepicker({
+	dateFormat: 'yy/mm/dd',
+	onClose: function( selectedDate ) {    
+       $("#end_day").datepicker( "option", "minDate", selectedDate );
+	}
+});
+
+$( "#end_day" ).datepicker({
+	dateFormat: 'yy/mm/dd',
+	onClose: function( selectedDate ) {    
+       $("#start_day").datepicker( "option", "maxDate", selectedDate );
+	}
+});
+
+function searchPlace(){
+	window.open("./searchPlaceSelectAction.pl","","width=500, height=300, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
+}
 
 </script>
 

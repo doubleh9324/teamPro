@@ -6,7 +6,6 @@ public class Place_detailBean {
 	private String screen_name;
 	private int capacity;
 	
-	
 	public String getP_code() {
 		return p_code;
 	}
