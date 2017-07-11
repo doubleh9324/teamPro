@@ -116,13 +116,13 @@ public class PlaceDAO {
 	protected V_plcaeBean makePlaceFromResultSet(ResultSet rs)throws SQLException{
 		V_plcaeBean pb = new V_plcaeBean();
 		pb.setP_code(rs.getString("p_code"));
+		pb.setType(rs.getString("type"));
 		pb.setName(rs.getString("name"));
 		pb.setScreen_name(rs.getString("screen_name"));
 		pb.setCapacity(rs.getShort("capacity"));
 		pb.setAddress(rs.getString("address"));
 		pb.setContact_num(rs.getString("contact_num"));
 		pb.setHomepage(rs.getString("homepage"));
-		
 		return pb;
 	}
 	
@@ -213,6 +213,61 @@ public class PlaceDAO {
 		}
 		
 		return 0;
+	}
+	
+	public List<V_plcaeBean> searchPlace(String s_cate, String s_place) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		List<V_plcaeBean> vplaceList = new ArrayList<>();
+		try{
+			con=getConnection();
+			//영화관 이름(마지막코드)와 지점이름(name) 둘 다 검색
+			if(s_cate.equals("name")){
+				sql="select p_code, type, name, screen_name, address, capacity from v_place "
+						+ "where type = (select theater_en from theater where theater_en like concat('%',?,'%') or theater_ko like concat('%',?,'%'))";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, s_place);
+				pstmt.setString(2, s_place);
+			} else if(s_cate.equals("address")){
+				sql="select substring(p_code,1,6) as p_code, type, name, screen_name, address, capacity "
+						+ "from v_place where address like concat('%',?,'%')";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, s_place);
+			}
+			
+			
+			rs = pstmt.executeQuery();
+			if(rs.next()){
+				System.out.println("검색작업");
+				do{
+					vplaceList.add(makevPlaceFromResultSet(rs));
+				}while(rs.next());
+				
+				System.out.println("입력완료 :" + vplaceList.size());
+				return vplaceList;
+			}else{
+				return Collections.emptyList();
+			}
+		}catch(Exception e){
+			System.out.println("PlaceDAO searchPlace error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return Collections.emptyList();		
+	}
+	
+	protected V_plcaeBean makevPlaceFromResultSet(ResultSet rs)throws SQLException{
+		V_plcaeBean pb = new V_plcaeBean();
+		pb.setP_code(rs.getString("p_code"));
+		pb.setType(rs.getString("type"));
+		pb.setName(rs.getString("name"));
+		pb.setScreen_name(rs.getString("screen_name"));
+		pb.setCapacity(rs.getShort("capacity"));
+		pb.setAddress(rs.getString("address"));
+		return pb;
 	}
 	
 	

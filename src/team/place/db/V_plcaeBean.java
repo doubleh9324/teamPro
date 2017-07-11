@@ -3,6 +3,7 @@ package team.place.db;
 public class V_plcaeBean {
 	
 	private String p_code;
+	private String type;
 	private String name;
 	private String screen_name;
 	private String address;
@@ -53,7 +54,11 @@ public class V_plcaeBean {
 	public void setHomepage(String homepage) {
 		this.homepage = homepage;
 	}
-	
-	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }

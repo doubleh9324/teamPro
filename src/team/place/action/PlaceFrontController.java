@@ -76,6 +76,14 @@ public class PlaceFrontController extends HttpServlet{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}else if(command.equals("/searchPlace.pl")){
+			action = new searchPlaceSelectAction();
+			try {
+				forward = new ActionForward();
+				forward.setPath("./searchplace.jsp");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}else if(command.equals("/searchPlaceSelectAction.pl")){
 			action = new searchPlaceSelectAction();
 			try {

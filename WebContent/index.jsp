@@ -271,7 +271,7 @@ $( "#end_day" ).datepicker({
 });
 
 function searchPlace(){
-	window.open("./searchPlaceSelectAction.pl","","width=500, height=300, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
+	window.open("./searchPlace.pl","","width=500, height=300, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
 }
 
 </script>
