@@ -17,7 +17,6 @@ public class searchPlaceSelectAction implements Action{
 		
 		String s_cate = request.getParameter("s_cate");
 		String s_place = request.getParameter("s_place");
-		int pnum = Integer.parseInt(request.getParameter("pnum"));
 		
 		PlaceDAO placeDao = new PlaceDAO();
 		List<V_plcaeBean> placeList = placeDao.searchPlace(s_cate, s_place);

@@ -226,7 +226,8 @@ public class PlaceDAO {
 			//영화관 이름(마지막코드)와 지점이름(name) 둘 다 검색
 			if(s_cate.equals("name")){
 				sql="select p_code, type, name, screen_name, address, capacity from v_place "
-						+ "where type = (select theater_en from theater where theater_en like concat('%',?,'%') or theater_ko like concat('%',?,'%'))";
+						+ "where type = (select theater_en from theater where theater_en like concat('%',?,'%') or theater_ko like concat('%',?,'%')) "
+						+ "order by substring(p_code, 3,4) , screen_name";
 				pstmt=con.prepareStatement(sql);
 				pstmt.setString(1, s_place);
 				pstmt.setString(2, s_place);

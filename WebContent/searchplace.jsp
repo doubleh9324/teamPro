@@ -7,6 +7,15 @@
 <title>Insert title here</title>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> 
+<style type="text/css">
+
+table td{
+border : black 1px solid;}
+
+</style>
+
+
+
 </head>
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -21,33 +30,31 @@
 
 극장 검색 : 
 <input type="text" id="s_place" name="s_place" >
-<button onclick="getSearch(1);">검색</button>
+<button onclick="getSearch();">검색</button>
 
-<input type="hidden" id="pnum" value="1">
-
+<form action="addPlaying.do" method="post" >
 <table>
 	<thead>
 		<tr>
+			<th>></th>
 			<th><input type="checkbox" id="ckall" name="ckall" onclick="selectAll(this);"></th>
 			<th>종류</th>
 			<th>명칭</th>
-			<th>관</th>
-			<th>좌석수</th>
 			<th>주소</th>
 		</tr>
 	</thead>
 	<tbody id="addlist">
-		
 	</tbody>
 </table>
+<button>추가</button>
+</form>
+
 <script type="text/javascript">
 
 $(document).ready(function(){
 
+	$(".screen td").attr("colspan", $(".tb_contract_list thead th").length);
 
-
-
-var add = $("#addlist");
 
 
 
@@ -57,9 +64,15 @@ var add = $("#addlist");
 
 <script type="text/javascript">
 
+$("#showbtn").click( function(){
+	if( $(this).html() == '▶'){
+		$(this).html('▼');
+	} else {
+		$(this).html('▶');
+	}
+});
 
-
-function getSearch(pnum){
+function getSearch(){
 	
 	var cate = $("#s_cate option:selected").val();
 	var place = $("#s_place").val();
@@ -68,7 +81,7 @@ function getSearch(pnum){
 	jQuery.ajax({
 	    type:"POST",
 	    url:"./searchPlaceSelectAction.pl",
-	    data : "pnum="+pnum+"&s_cate="+cate+"&s_place="+place,
+	    data : "s_cate="+cate+"&s_place="+place,
 	    dataType:"JSON",
 	    success : function(data) {
 	    	
@@ -79,18 +92,64 @@ function getSearch(pnum){
 	    		add.append(str);
 	    	}else{
 	    		
+	    	var place="";
+	    	var screen=""
 	    	var str="";
+	    	var prepcode="";
+ 	    	var place="";
+ 	    	var screen=""
+	    	var func = "";
+ 	    	var num =1;
+ 	    	
 	    	 $.each(data.placeList, function(key, value){
-		            str += "<tr><td><input type='checkbox' name='ck_pcode' value='"+value.p_code+"' ></td>'" +
-		                        "<td>" + value.type + "</td>" +
-		                        "<td>" + value.name + "</td>"+
-		                        "<td>" + value.screen_name + "</td>" +
-		                        "<td>" + value.capacity + "</td>" +
-		                        "<td>" + value.address + "</td>" +
+				
+	 	    	
+					
+					if(prepcode!=value.p_code){
+						
+						//값이 다르면 str에 저장된 정보들을 넣은 후에 새로 place를 저장 후 같은 과정 반복
+						str += place+screen;
+						screen="";
+						num =1;
+						place = "<tr><td><a id='showbtn' onclick='showScreen(\""+value.p_code+"\")'>▶</a></td>"+
+	            			"<td><input type='checkbox' name='a_pcode' value='"+value.p_code+"' onclick='selectGroup();'></td>" +
+	                        "<td>" + value.type + "</td>" +
+	                        "<td>" + value.name + "</td>" +
+	                        "<td>" + value.address + "</td>" +
+	                        "</tr>";
+						
+						do{
+							//처음 place를 추가하고 해당하는 열의 screen을 한번만 넣어주기
+							screen += "<tr name='sc"+value.p_code+"' style='display:none;' class='screen'>"+
+	   						"<td></td>" +
+	   						"<td><input type='checkbox' id='"+value.p_code+num+"' name='pcode' value='"+value.p_code+num+"' ></td>"+
+	   						"<td>"+value.screen_name +"</td>"+ 
+	   						"<td>"+value.capacity+"</td>"+
+	   						"</td>"+
 		                    "</tr>";
+		                    
+		                   
+						}while(false);
+						 num++;
+						prepcode=value.p_code;
+						
+					}else{
+						//현재 조회하는 pcode와 이전에 추가한 pcode의 값이 같으면 screen 정보만 추가하고
+						screen += "<tr name='sc"+value.p_code+"' style='display:none;'>"+
+   						"<td></td>" +
+   						"<td><input type='checkbox'id='"+value.p_code+num+"' name='pcode' value='"+value.p_code+num+"' ></td>"+
+   						"<td>" + value.screen_name + "</td>" +
+                        "<td>" + value.capacity + "</td>" +
+	                    "</tr>";					
+	                    
+						prepcode=value.p_code;
+						
+						num++;
+					}
+		           
 		        });
+	    	add.append(str).trigger("create");
 	    	 
-	    	 add.append(str).trigger("create");
 	    	}
 	    },
 	    complete : function(data) {
@@ -103,28 +162,75 @@ function getSearch(pnum){
 }
 
 
-function selectAll(obj){
+function showScreen(pcode){
 	
-	var checkbox = document.getElementsByName('ck_pcode');
+	//모양먼저 바꿔주고
+//	$("#").val('▼');
+	
+//	$("#"+pcode).css("display", "none");
+	
+	if( $("#showbtn").html() == '▶'){
+		$("#showbtn").html('▼');
+		
+		$("[name = 'sc"+pcode+"']").css("display", "table-row");
+	} else {
+		$("#showbtn").html('▶');
+		$("[name = 'sc"+pcode+"']").css("display", "none");
+	}
+}
+
+
+function selectAll(){
+	
+	//전체 선택버튼 isAllch - ckall , 그룹 선택버튼 pcheckbox - a_pcode, 개별 선택버튼 scheckbox - p_code(값) (name값)
 	var isAllch = document.getElementById('ckall').checked;
-	var size = checkbox.length;
 	
-	//선택되면
-	if(isAllch == true)
-	{	//전체 선택하기
-		for(var i =0; i<size; i++){
-			checkbox[i].checked = true;
-		}	
+	
+	//전체선택 제어
+	if(isAllch == true){	//전체 선택하기
+	
+		$("input:checkbox").prop("checked", true);
+		
+	//	$("input:checkbox[name:'"+pcheckbox.value+"']").prop("checked", true);
 	} else {
 		//전체선택 해제하기
-		for(var i=0; i<size; i++){
-			checkbox[i].checked = false;
+		$("input:checkbox").prop("checked", false);
+	//	$("input:checkbox[name:'"+pcheckbox.value+"']").prop("checked", false);
+	}
+}
+
+function selectGroup(obj){
+	//p_code값을 value값으로 가짐
+	var pcheckbox = document.getElementsByName('a_pcode');
+	var scheckbox = document.getElementsByName('pcode');
+	
+	for(var i=0; i<pcheckbox.length; i++){
+		if(pcheckbox[i].checked == true){
+			
+			//p_code값
+			window.alert(pcheckbox[i].value);
+			
+			//
+			$('input:checkbox[name="pcode"]').each(function() {
+			var pcode = this.value;
+			window.alert(pcode);
+     			if(pcode.substring(0,6) == pcheckbox[i].value){ //값 비교
+            		this.checked = true; //checked 처리
+            		window.alert(this.id);
+				}
+ 			});
+
+
+
+			
+		}else if(pcheckbox[i].checked ==  false){
+			$("input:checkbox[name='"+pcheckbox[i].value+"']").prop("checked",false);
 		}
 	}
 }
 
 function selectNone(){
-	var checkbox = document.getElementsByName('ck_pcode');
+	var checkbox = document.getElementsByName('a_pcode');
 	var checkall = document.getElementById('ckall');
 	
 	for(var i=0; i<checkbox.length; i++){
