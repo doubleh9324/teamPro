@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import team.common.action.Action;
+import team.common.action.ActionForward;
+import team.place.action.searchPlaceSelectAction;
+
 public class MovieFrontController extends HttpServlet {
 	protected void doProcess(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
 		String RequestURI=req.getRequestURI();
 		System.out.println(RequestURI);
 		
@@ -26,6 +29,9 @@ public class MovieFrontController extends HttpServlet {
 		
 		if(command.equals("/MovieInsert.mo")){
 			forward= new ActionForward();
+			forward.setRedirect(false);
+			forward.setPath("index2.jsp?center=movie/movieInsert.jsp");
+			
 		}else if(command.equals("/MovieInsertAction.mo")){
 			action = new MovieInsertAction();
 			try {
@@ -34,6 +40,34 @@ public class MovieFrontController extends HttpServlet {
 				e.printStackTrace();
 			}
 			
+		}else if(command.equals("/MovieContentAction.mo")){
+			action = new MovieContentAction();
+			try {
+				forward= action.excute(req, resp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/MovieListAction.mo")){
+			action = new MovieListAction();
+			try {
+				forward= action.excute(req, resp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/searchMovie.mo")){
+			try {
+				forward = new ActionForward();
+				forward.setPath("./searchmv.jsp");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/searchPlayingMvSelectAction.mo")){
+			action = new searchPlayingMvSelectAction();
+			try {
+				forward= action.excute(req, resp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		//(���� �ּҷ� �̵�)

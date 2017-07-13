@@ -236,6 +236,20 @@ public class PlaceDAO {
 						+ "from v_place where address like concat('%',?,'%')";
 				pstmt=con.prepareStatement(sql);
 				pstmt.setString(1, s_place);
+			} else if(s_cate.equals("all")){
+				//전체검색 수정해야함
+				if(s_place == null){
+					sql="select substring(p_code,1,6) as p_code, type, name, screen_name, address, capacity " 
+							+ "from v_place";
+					pstmt=con.prepareStatement(sql);
+				} else {
+					sql="select substring(p_code,1,6) as p_code, type, name, screen_name, address, capacity " 
+							+ "from v_place where (name like concat('%',?,'%') or screen_name like concat('%',?,'%') or address like concat('%',?,'%'))";
+					pstmt=con.prepareStatement(sql);
+					pstmt.setString(1, s_place);
+					pstmt.setString(2, s_place);
+					pstmt.setString(3, s_place);
+				}
 			}
 			
 			

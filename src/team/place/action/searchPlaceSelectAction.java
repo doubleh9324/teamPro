@@ -15,6 +15,7 @@ public class searchPlaceSelectAction implements Action{
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		
 		String s_cate = request.getParameter("s_cate");
 		String s_place = request.getParameter("s_place");
 		

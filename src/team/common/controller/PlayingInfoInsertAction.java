@@ -26,12 +26,7 @@ public class PlayingInfoInsertAction extends HttpServlet{
 	// doGet,doPost 방식으로 데이터가 넘어오던 모두 requestpro메소드에서 처리
 		private void requestpro(HttpServletRequest request, HttpServletResponse response)
 				throws ServletException, IOException {
-			//관 번호(순서대로 정렬했을 때)를 뒤에 붙인 p_code 전달 완료. 해당하는 p_code에 영화 상영
-			String pcode[] = request.getParameterValues("pcode");
-			
-			for(int i=0; i<pcode.length; i++){
-			System.out.println(pcode[i]);
-			}
+
 			
 			//데이터베이스에 연결하여 하나의 자동차 정보를 읽어 드림
 			

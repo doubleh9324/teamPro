@@ -21,14 +21,16 @@ public class PlayingInsertAction implements Action{
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
-		
+		//pcode 배열로 받아와서 뒤에붙은 숫자 떼고 순서 정해서 넣어야하고 뒤에 영화관 넣어줘야한당 8ㅅ8
 		String sday = request.getParameter("start_day");
 		String eday = request.getParameter("end_day");
 		int ping_num = Integer.parseInt(request.getParameter("ping_num"));
 		
 		PlayingBean pb = new PlayingBean();
 		pb.setPing_num(ping_num);
-		pb.setP_code(request.getParameter("p_code"));
+		
+		
+		
 		pb.setNc_code(request.getParameter("nc_code"));
 		pb.setStart_day(sday);
 		pb.setEnd_day(eday);
@@ -62,6 +64,9 @@ public class PlayingInsertAction implements Action{
 		boolean ptbRe = false;
 		
 		PlayingDAO playingDao = new PlayingDAO();
+		
+		String p_code = playingDao.getPcode(request.getParameter("p_code"));
+		pb.setP_code(p_code);
 		pbRe = playingDao.insertPlaying(pb);
 		ptbRe = playingDao.insertPlaytime(ptList);
 		

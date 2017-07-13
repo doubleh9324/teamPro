@@ -21,6 +21,31 @@ public class PlayingDAO {
 		return con;
 	}
 	
+	public String getPcode(String pcode){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		
+		try{
+			con=getConnection();
+			
+			sql="select * from place where p_code like concat(?,'%')";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, pcode);
+			rs.next();
+			
+			return rs.getString(1);
+			
+		}catch(Exception e){
+			System.out.println("insertPlaying error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return null;
+	}
+	
 	public boolean insertPlaying(PlayingBean pb){
 		Connection con= null;
 		PreparedStatement pstmt = null;

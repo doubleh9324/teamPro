@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import team.movie.action.passMOcodeAction;
+
+
 
 public class PlayingFrontController extends HttpServlet{
 	
@@ -57,20 +60,21 @@ public class PlayingFrontController extends HttpServlet{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else if(command.equals("/LocationInsertAction.pl")){
-			//지역코드 추가
+		}else if(command.equals("/passPcode.pg")){
+				action = new passPcodeAction();
 			try {
 				forward= action.execute(request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else if(command.equals("/PlaceListSelectAction.pl")){
-			try {
-				forward= action.execute(request, response);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		}else if(command.equals("/passMOcode.pg")){
+			action = new passMOcodeAction();
+		try {
+			forward= action.execute(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+	}
 		
 		if(forward!=null){//new ActionForward()��ü�� �����ϰ�...
 			if(forward.isRedirect()){//true->sendRedirect()���

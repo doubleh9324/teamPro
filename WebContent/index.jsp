@@ -88,7 +88,7 @@
 								<option value="mb">메가박스</option>
 							</select>
 						</td>
-						<td><input type="text" name="p_code" id="p_code"></td>
+						<td><input type="text" name="p_code" id="p_code" ></td>
 						<td><input type="text" name="name"></td>
 						<td><input type="text" name="screen_name"></td>
 						<td><input type="text" name="address"></td>
@@ -124,6 +124,8 @@
 		
 		</form>
 		
+		<input type="text" id="isGetPcode" value=${isGetPcode }>
+		<input type="text" id="isGetMOcode" value=${isGetMOcode }>
 		상영영화 추가
 		<form action="./PlayingInsertAction.pg" method="post">
 			<table>
@@ -138,9 +140,9 @@
 				</thead>
 				<tbody>
 					<tr>
-						<td><input type="text" id="ping_num" name="ping_num" value="${pnumMax }"></td>
-						<td><input type="text" name="p_code" onclick="searchPlace()"></td>
-						<td><input type="text" name="nc_code"></td>
+						<td><input type="text" name="ping_num" id="ping_num" value="${pnumMax }"></td>
+						<td><input type="text" name="p_code" id="p_code" value="${psize }개 선택" onclick="searchPlace();"></td>
+						<td><input type="text" name="nc_code" id="nc_code" onclick="searchContent();"></td>
 						<td><input type="text" name="start_day" id="start_day"></td>
 						<td><input type="text" name="end_day" id="end_day"></td>
 					</tr>
@@ -161,7 +163,6 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-	
 	
 	
 	var setflag = $("#setFlag").val();
@@ -219,8 +220,17 @@ $(document).ready(function(){
   	 });
 	}
 	
+	var isGetPcode = $("#isGetPcode").val();
+	
+	if(isGetPcode == 'y'){
+		<c:set var="psize" value='${psize}' />
+		$("#p_code").val(psize+"개 상영관 선택");
+	}
+	
 	
 });
+
+
 
 </script>
 
@@ -272,6 +282,10 @@ $( "#end_day" ).datepicker({
 
 function searchPlace(){
 	window.open("./searchPlace.pl","","width=500, height=300, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
+}
+
+function searchContent(){
+	window.open("./searchMovie.mo","","width=500, height=300, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
 }
 
 </script>

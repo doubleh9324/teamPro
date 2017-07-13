@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Search Place</title>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> 
 <style type="text/css">
@@ -24,6 +24,7 @@ border : black 1px solid;}
 다만 나중에 지역별 공연장 검색으로 사용 , 상영상연하는 공연들은 기간을 2달로 고정 할 것 -->
 
 <select name="s_cate" id="s_cate">
+	<option value="all">전체</option>
 	<option value="name">이름</option>
 	<option value="address">위치</option>
 </select>
@@ -32,7 +33,7 @@ border : black 1px solid;}
 <input type="text" id="s_place" name="s_place" >
 <button onclick="getSearch();">검색</button>
 
-<form action="addPlaying.do" method="post" >
+<form action="passPcode.pg" id="pcodeList" method="post" >
 <table>
 	<thead>
 		<tr>
@@ -46,7 +47,7 @@ border : black 1px solid;}
 	<tbody id="addlist">
 	</tbody>
 </table>
-<button>추가</button>
+<button onclick="fn_goToParent();">추가</button>
 </form>
 
 <script type="text/javascript">
@@ -63,6 +64,17 @@ $(document).ready(function(){
 </script>
 
 <script type="text/javascript">
+
+function fn_goToParent() {
+	   var f = document.getElementById("pcodeList");  // 전송할 폼 ID(현재 자식창내)
+	   f.action = "passPcode.pg";    // 실행할 액션
+	   opener.window.name = "Insert Page";   // 부모창 이름 설정(임의 설정 가능)
+	   f.target = opener.window.name;     // 액션 실행 방향 (부모창)
+	   f.submit();
+	   window.close();
+	   opener.document.focus();            // 부모창 포커스
+	   
+}
 
 $("#showbtn").click( function(){
 	if( $(this).html() == '▶'){
@@ -207,16 +219,12 @@ function selectGroup(obj){
 	for(var i=0; i<pcheckbox.length; i++){
 		if(pcheckbox[i].checked == true){
 			
-			//p_code값
-			window.alert(pcheckbox[i].value);
 			
 			//
 			$('input:checkbox[name="pcode"]').each(function() {
 			var pcode = this.value;
-			window.alert(pcode);
      			if(pcode.substring(0,6) == pcheckbox[i].value){ //값 비교
             		this.checked = true; //checked 처리
-            		window.alert(this.id);
 				}
  			});
 
