@@ -16,8 +16,8 @@
 <script src="//code.jquery.com/jquery.min.js"></script>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src='//cdn.rawgit.com/fgelinas/timepicker/master/jquery.ui.timepicker.js'></script>
-
 <!-- import 파일 정리 할 것 -->
+
 영화
 	<form action="./MovieInsertAction.mo" method="post">
 
@@ -124,9 +124,9 @@
 		
 		</form>
 		
-		<input type="text" id="isGetPcode" value=${isGetPcode }>
-		<input type="text" id="isGetMOcode" value=${isGetMOcode }>
-		상영영화 추가
+		<input type="hidden" id="isGetPcode" value=${isGetPcode }>
+		<input type="hidden" id="isGetMOcode" value=${isGetMOcode }>
+		<h2>상영영화 추가</h2>
 		<form action="./PlayingInsertAction.pg" method="post">
 			<table>
 				<thead>
@@ -147,6 +147,17 @@
 						<td><input type="text" name="end_day" id="end_day"></td>
 					</tr>
 					<tr>
+						<td></td>
+						<td><a id="showPlist" onclick="showPcodeList();">show</a></td>
+					</tr>
+					<c:forEach var="value" items="${pcodeList}" varStatus="status">
+                     	<tr>
+                     		<td></td>
+	                     	<td colspan='3'><input type="text" name="p_codeList" readonly value="${value }" style="display:none;"></td>
+                     	</tr>
+			        </c:forEach>
+					
+					<tr>
 						<th>회차</th>
 						<td colspan="4">
 						<input type="text" name="time" class="time">
@@ -161,6 +172,7 @@
 		</form>
 	
 <script type="text/javascript">
+
 
 $(document).ready(function(){
 	
@@ -222,10 +234,6 @@ $(document).ready(function(){
 	
 	var isGetPcode = $("#isGetPcode").val();
 	
-	if(isGetPcode == 'y'){
-		<c:set var="psize" value='${psize}' />
-		$("#p_code").val(psize+"개 상영관 선택");
-	}
 	
 	
 });
@@ -235,6 +243,19 @@ $(document).ready(function(){
 </script>
 
 <script type="text/javascript">
+
+function showPcodeList(){
+	//버튼 모양 안바뀌는거 수정해
+	var btn = $("#showPlist");
+	
+	if(btn.val() == "show"){
+		btn.val("hidden");
+		$("input:text[name='p_codeList']").css("display", "block");
+	} else {
+		btn.val("show");
+		$("input:text[name='p_codeList']").css("display", "none");
+	}
+}
 
 //p_code 자동출력
 var pnum = $("#p_num");

@@ -16,7 +16,7 @@ public class passPcodeAction implements Action {
 		}
 		*/
 		
-		request.setAttribute("pcode", pcode);
+		request.setAttribute("pcodeList", pcode);
 		request.setAttribute("psize", pcode.length);
 		request.setAttribute("isGetPcode", "y");
 		

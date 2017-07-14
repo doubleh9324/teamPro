@@ -7,7 +7,7 @@ public class PlayTimeBean {
 	
 	private int ping_num;
 	private String play_day;
-	private String[] playtime;
+	private String playtime;
 	
 	public int getPing_num() {
 		return ping_num;
@@ -26,16 +26,15 @@ public class PlayTimeBean {
 		this.play_day = setDateFormat(pday);
 	}
 	
-	public String[] getPlaytime() {
+	public String getPlaytime() {
 		return playtime;
 	}
 
-	public void setPlaytime(Date[] ptime) {
-		for(int i=0; i<ptime.length; i++)
-			this.playtime[i] = setTimeFormat(ptime[i]);
+	public void setPlaytime(Date ptime) {
+			this.playtime = setTimeFormat(ptime);
 	}
 	
-	public void setPlaytime(String[] ptime) {
+	public void setPlaytime(String ptime) {
 			this.playtime = ptime;
 	}
 	

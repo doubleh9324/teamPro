@@ -19,7 +19,8 @@ border : black 1px solid;}
 </head>
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
+<!-- 세모가 지맘대로군 -->
+<!-- 전체 선택 후 그룹요소 해제되면 대표 체크 지우기 -->
 <!-- sql로 날짜 검색해서 상영에 해당하는 영화들을 넣을거라서 세세하게 구현하지않음
 다만 나중에 지역별 공연장 검색으로 사용 , 상영상연하는 공연들은 기간을 2달로 고정 할 것 -->
 

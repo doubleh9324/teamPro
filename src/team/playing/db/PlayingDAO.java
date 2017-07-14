@@ -30,10 +30,14 @@ public class PlayingDAO {
 		try{
 			con=getConnection();
 			
-			sql="select * from place where p_code like concat(?,'%')";
+			sql="select p_code from place where p_code like concat(?,'%')";
 			pstmt=con.prepareStatement(sql);
 			pstmt.setString(1, pcode);
+			
+			rs = pstmt.executeQuery();
 			rs.next();
+			
+			System.out.println(rs.getString(1));
 			
 			return rs.getString(1);
 			
@@ -46,7 +50,75 @@ public class PlayingDAO {
 		return null;
 	}
 	
-	public boolean insertPlaying(PlayingBean pb){
+	public String getScreenName(String pcode, int scrNum){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		PreparedStatement ppstmt = null;
+		String sql="";
+		String presql="set @num=0";
+		ResultSet rs = null;
+		//뒤에 영화관 자른 pcode 가져올 것
+		try{
+			con=getConnection();
+			
+			
+			//num=0
+			ppstmt = con.prepareStatement(presql);
+			ppstmt.executeQuery();
+			
+			
+			sql="select b.screen_name from "
+					+ "(select @num:=@num+1 as num , screen_name, p_code from v_place where p_code=? order by screen_name) a "
+					+ "join v_place b where a.p_code = b.p_code and a.screen_name=b.screen_name and a.num = ? ";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, pcode);
+			pstmt.setInt(2, scrNum);
+			
+			rs = pstmt.executeQuery();
+			rs.next();
+			System.out.println(pstmt.toString());
+
+			return rs.getString(1);
+			
+		}catch(Exception e){
+			System.out.println("getScreenName error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return null;
+	}
+	
+	public int getCapacity(String pcode){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		//뒤에 영화관 자른 pcode 가져올 것
+		try{
+			con=getConnection();
+			
+			sql="select capacity from place_detail where p_code = ?";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, pcode);
+			
+			rs = pstmt.executeQuery();
+			rs.next();
+			
+			System.out.println(rs.getString(1));
+			
+			return rs.getInt(1);
+			
+		}catch(Exception e){
+			System.out.println("getCapacity error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return 0;
+	}
+	
+	public boolean insertPlaying(List<PlayingBean> playList){
 		Connection con= null;
 		PreparedStatement pstmt = null;
 		String sql="";
@@ -55,19 +127,68 @@ public class PlayingDAO {
 		try{
 			con=getConnection();
 			
-			sql="insert into playing (ping_num, p_code, nc_code, start_day, end_day)"
-					+ " values (?,?,?,?,?)";
-			pstmt=con.prepareStatement(sql);
-			pstmt.setInt(1, pb.getPing_num());
-			pstmt.setString(2, pb.getP_code());
-			pstmt.setString(3, pb.getNc_code());
-			pstmt.setString(4, pb.getStart_day());
-			pstmt.setString(5, pb.getEnd_day());
-			re = pstmt.executeUpdate();
+			for(int i=0; i<playList.size(); i++){
+				pstmt = null;
+				sql="insert into playing (ping_num, p_code, nc_code, start_day, end_day)"
+						+ " values (?,?,?,?,?) ";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setInt(1, playList.get(i).getPing_num());
+				pstmt.setString(2, playList.get(i).getP_code());
+				pstmt.setString(3, playList.get(i).getNc_code());
+				pstmt.setString(4, playList.get(i).getStart_day());
+				pstmt.setString(5, playList.get(i).getEnd_day());
+				
+				System.out.println(pstmt.toString());
+				//총 re개의 insert 실행
+				re += pstmt.executeUpdate();
+			}
 			
 			if(re!=0){
 				return true;
 			}
+			
+
+		}catch(Exception e){
+			System.out.println("insertPlaying error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return false;
+	}
+	
+	public boolean insertSeatInfo(List<SeatInfoBean> siList){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		int re = 0;
+		
+		try{
+			con=getConnection();
+			
+			for(int i=0; i<siList.size(); i++){
+				pstmt = null;
+				sql="insert into seatinfo(ping_num, p_code, screen_name, seatclass, price, seat_num, event_code) "
+						+ " values (?,?,?,?,?,?,?) ";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setInt(1, siList.get(i).getPing_num());
+				pstmt.setString(2, siList.get(i).getP_code());
+				pstmt.setString(3, siList.get(i).getScreen_name());
+				pstmt.setString(4, siList.get(i).getSeatclass());
+				pstmt.setInt(5, siList.get(i).getPrice());
+				pstmt.setInt(6, siList.get(i).getSeat_num());
+				pstmt.setString(7, siList.get(i).getEvent_code());
+				
+				System.out.println(pstmt.toString());
+				//총 re개의 insert 실행
+				re += pstmt.executeUpdate();
+			}
+			
+			if(re!=0){
+				return true;
+			}
+			
+
 		}catch(Exception e){
 			System.out.println("insertPlaying error : "+e);
 		}finally{
@@ -84,30 +205,32 @@ public class PlayingDAO {
 		int re = -1;
 		SimpleDateFormat formatter = new SimpleDateFormat("kk:mm:ss");
 		
+		
+		System.out.println(ptbList.get(0).getPlaytime()+"/"+ptbList.get(1).getPlaytime());
 		try{
 			con=getConnection();
 			
 			//상영 기간동안
 			for(int i=0; i<ptbList.size(); i++){
+				pstmt = null;
+				sql="insert into playtime (ping_num, play_day, ptime) values (?,?,?)";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setInt(1, ptbList.get(i).getPing_num());
+				pstmt.setString(2, ptbList.get(i).getPlay_day());
+				String time = ptbList.get(i).getPlaytime();
+				System.out.println(time);
+				pstmt.setString(3, time);
+				//총 re개의 insert실행
 				
-				//하루 3회차 추가
-				for(int j=0; j<3; j++ ){
-					sql="insert into playtime (ping_num, play_day, time)"
-							+ " values (?,?,?)";
-					pstmt=con.prepareStatement(sql);
-					pstmt.setInt(1, ptbList.get(i).getPing_num());
-					pstmt.setString(2, ptbList.get(i).getPlay_day());
-					String time[] = ptbList.get(i).getPlaytime();
-					pstmt.setDate(3, java.sql.Date.valueOf(formatter.format(time[j])));
-					
-					re = pstmt.executeUpdate();
-					System.out.println(time[j]);
-					if(re==0)
-						return false;
-				}
+				System.out.println(pstmt.toString());
+				re += pstmt.executeUpdate();
+			}
+			
+			if(re!=0){
+				return true;
 			}
 		}catch(Exception e){
-			System.out.println("insertPlaying error : "+e);
+			System.out.println("insertPlayingtime error : "+e);
 		}finally{
 			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}

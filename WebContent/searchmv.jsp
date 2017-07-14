@@ -34,7 +34,6 @@ border : black 1px solid;}
 <table>
 	<thead>
 		<tr>
-			<th><input type="checkbox" id="ckall" name="ckall" onclick="selectAll(this);"></th>
 			<th>제목</th>
 			<th>감독</th>
 			<th>제작사</th>
@@ -45,6 +44,8 @@ border : black 1px solid;}
 	</tbody>
 </table>
 <button onclick="fn_goToParent();">추가</button>
+
+
 <script type="text/javascript">
 
 function fn_goToParent(monum, mday) {
@@ -67,7 +68,7 @@ function fn_goToParent(monum, mday) {
 	  // f.target = opener.window.name;     // 액션 실행 방향 (부모창)
 	  // f.submit();
 	  window.close();
-	  opener.document.focus();
+	  opener.document.getElementById("start_day").focus();
 	  
 	   
 }
@@ -98,7 +99,6 @@ function getSearch(){
 	 	    	
 	    	 $.each(data.movieList, function(key, value){
 				str += "<tr>"+
-           			"<td><input type='checkbox' name='mocode' value='"+value.movie_num+"'></td>" +
                        "<td><a onclick='fn_goToParent("+value.movie_num+","+value.open_day.replace(/-/g, '')+")'>" + value.name + "</a></td>" +
                        "<td>" + value.director + "</td>" +
                        "<td>" + value.production + "</td>" +
