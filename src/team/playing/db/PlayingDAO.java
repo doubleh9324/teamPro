@@ -16,7 +16,7 @@ public class PlayingDAO {
 	private Connection getConnection() throws Exception{
 		Connection con=null;
 		Context init=new InitialContext();
-		DataSource ds=(DataSource)init.lookup("java:comp/env/jdbc/team");
+		DataSource ds=(DataSource)init.lookup("java:comp/env/jdbc/TicketLion");
 		con=ds.getConnection();
 		return con;
 	}
@@ -37,7 +37,6 @@ public class PlayingDAO {
 			rs = pstmt.executeQuery();
 			rs.next();
 			
-			System.out.println(rs.getString(1));
 			
 			return rs.getString(1);
 			
@@ -76,7 +75,6 @@ public class PlayingDAO {
 			
 			rs = pstmt.executeQuery();
 			rs.next();
-			System.out.println(pstmt.toString());
 
 			return rs.getString(1);
 			
@@ -105,7 +103,6 @@ public class PlayingDAO {
 			rs = pstmt.executeQuery();
 			rs.next();
 			
-			System.out.println(rs.getString(1));
 			
 			return rs.getInt(1);
 			
@@ -206,7 +203,6 @@ public class PlayingDAO {
 		SimpleDateFormat formatter = new SimpleDateFormat("kk:mm:ss");
 		
 		
-		System.out.println(ptbList.get(0).getPlaytime()+"/"+ptbList.get(1).getPlaytime());
 		try{
 			con=getConnection();
 			
@@ -217,9 +213,7 @@ public class PlayingDAO {
 				pstmt=con.prepareStatement(sql);
 				pstmt.setInt(1, ptbList.get(i).getPing_num());
 				pstmt.setString(2, ptbList.get(i).getPlay_day());
-				String time = ptbList.get(i).getPlaytime();
-				System.out.println(time);
-				pstmt.setString(3, time);
+				pstmt.setString(3, ptbList.get(i).getPlaytime());
 				//총 re개의 insert실행
 				
 				System.out.println(pstmt.toString());

@@ -17,7 +17,7 @@ public class MovieDAO {
 	private Connection getConnection() throws Exception{
 		Connection con=null;
 		Context init=new InitialContext();
-		DataSource ds=(DataSource)init.lookup("java:comp/env/jdbc/team");
+		DataSource ds=(DataSource)init.lookup("java:comp/env/jdbc/TicketLion");
 		con=ds.getConnection();
 		return con;
 	}
@@ -49,6 +49,30 @@ public class MovieDAO {
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
 		}
 		return v;
+	}
+	
+	public boolean setPlaying(String nc_code){
+		Connection con=null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		
+		try{
+			con=getConnection();
+			
+			sql = "update movie set playing = 1 where movie_num = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, nc_code.substring(3));
+			
+			
+			
+		}catch(Exception e){
+			System.out.println("setPlayingMovies : "+e);
+			
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return false;
 	}
 	
 	public Vector<MovieBean> splayingMovies(String s_cate, String s_movie){

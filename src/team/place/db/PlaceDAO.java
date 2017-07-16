@@ -17,7 +17,7 @@ public class PlaceDAO {
 	private Connection getConnection() throws Exception{
 		Connection con=null;
 		Context init=new InitialContext();
-		DataSource ds=(DataSource)init.lookup("java:comp/env/jdbc/team");
+		DataSource ds=(DataSource)init.lookup("java:comp/env/jdbc/TicketLion");
 		con=ds.getConnection();
 		return con;
 	}

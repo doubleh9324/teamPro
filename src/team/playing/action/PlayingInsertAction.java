@@ -67,7 +67,7 @@ public class PlayingInsertAction implements Action{
 		}
 		
 		int pcNum = 0;
-		int scNum = 0;
+		int scNum = -1;
 		//하나의 ping_num에 해당하는 루트를 
 		//psize만큼 playlist에 추가하기 (p_code 값만 다름)
 		//하나의 p_code에 3개의 time값 * 상영하는 날짜만큼
@@ -96,63 +96,13 @@ public class PlayingInsertAction implements Action{
 				playList.add(pb);
 				
 
-				System.out.println(p_coden[pcNum].substring(6, 7));
 				
 				//하나의 pcode에 3개의 등급
-				for(int q=0; q<3; q++){
-					SeatInfoBean sib = new SeatInfoBean();
-					System.out.println(">>>>>>>>>>ping_num : "+ping_num);
-					//제일 처음엔 값 그대로 넣기
-					sib.setPing_num(ping_num);
-					sib.setP_code(p_code[pcNum]);
-					System.out.println( p_num[scNum]);
-					String scrName = playingDao.getScreenName(p_code[pcNum].substring(0,6), p_num[scNum]);
-					sib.setScreen_name(scrName);
-					
-					String[] sClass = {"VIP", "R", "S"};
-					int[] sPrice = {11000, 9000, 8000};
-					sib.setSeatclass(sClass[q]);
-					sib.setPrice(sPrice[q]);
-					int cap = playingDao.getCapacity(p_code[pcNum]);
-					
-					//등급에 따라 가격 정하기
-					if(q==0){
-						//vip 10%
-						sib.setSeat_num((int)(cap*0.1));
-					}else if(q==1){
-						//R 30%
-						sib.setSeat_num((int)(cap*0.3));
-					}else if(q==2){
-						//S 60%
-						sib.setSeat_num((int)(cap*0.6));
-					}
-					
-					sib.setEvent_code("n");
-					
-					siList.add(sib);
-					System.out.println("siList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + scrName + " / " + 
-										sClass[q]+ " / " + sPrice[q]);
+				do{
+					System.out.println(scNum);
 
-				}
-				scNum++;
-				pcNum++;
-			}else if(!(p_code[pcNum-1].equals(p)) && (pcNum>0)){
-				//pcode가 새로운 값일 때
-				ping_num++;
-				
-				System.out.println(">>>>>>>>>>ping_num : "+ping_num);
-				pb.setPing_num(ping_num);
-				p_code[pcNum] = p;
-				pb.setP_code(p_code[pcNum]);
-				pb.setNc_code(nc_code);
-				pb.setStart_day(sday);
-				pb.setEnd_day(eday);
-				System.out.println("pcNum>0 :"+p+" / " +p_code[pcNum-1]);
-				playList.add(pb);
-				System.out.println("playList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + nc_code + " / " + sday+ " / " + eday);
-				
+					scNum++;
 
-				
 					for(int q=0; q<3; q++){
 						SeatInfoBean sib = new SeatInfoBean();
 						System.out.println(">>>>>>>>>>ping_num : "+ping_num);
@@ -186,9 +136,71 @@ public class PlayingInsertAction implements Action{
 						System.out.println("siList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + scrName + " / " + 
 											sClass[q]+ " / " + sPrice[q]);
 					}
+					if(scNum == psize-1)
+						break;
+				}while(p_coden[scNum].substring(0,6).equals(p_coden[scNum+1].substring(0, 6)));
+				pcNum++;
+			}else if(!(p_code[pcNum-1].equals(p)) && (pcNum>0)){
+				//pcode가 새로운 값일 때
+				//날짜 입력을 위한 변수 처음 값으로 초기화
+				cal.setTime(sd);
+				ping_num++;
+				
+				System.out.println(">>>>>>>>>>ping_num : "+ping_num);
+				pb.setPing_num(ping_num);
+				p_code[pcNum] = p;
+				pb.setP_code(p_code[pcNum]);
+				pb.setNc_code(nc_code);
+				pb.setStart_day(sday);
+				pb.setEnd_day(eday);
+				System.out.println("pcNum>0 :"+p+" / " +p_code[pcNum-1]);
+				playList.add(pb);
+				System.out.println("playList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + nc_code + " / " + sday+ " / " + eday);
 				
 				
-				
+				//하나의 pcode에 3개의 등급
+				do{
+					System.out.println(scNum);
+
+					scNum++;
+
+					for(int q=0; q<3; q++){
+						SeatInfoBean sib = new SeatInfoBean();
+						System.out.println(">>>>>>>>>>ping_num : "+ping_num);
+						//제일 처음엔 값 그대로 넣기
+						sib.setPing_num(ping_num);
+						sib.setP_code(p_code[pcNum]);
+						String scrName = playingDao.getScreenName(p_code[pcNum].substring(0,6), p_num[scNum]);
+						sib.setScreen_name(scrName);
+						
+						String[] sClass = {"VIP", "R", "S"};
+						int[] sPrice = {11000, 9000, 8000};
+						sib.setSeatclass(sClass[q]);
+						sib.setPrice(sPrice[q]);
+						int cap = playingDao.getCapacity(p_code[pcNum]);
+						
+						//등급에 따라 가격 정하기
+						if(q==0){
+							//vip 10%
+							sib.setSeat_num((int)(cap*0.1));
+						}else if(q==1){
+							//R 30%
+							sib.setSeat_num((int)(cap*0.3));
+						}else if(q==2){
+							//S 60%
+							sib.setSeat_num((int)(cap*0.6));
+						}
+						
+						sib.setEvent_code("n");
+						
+						siList.add(sib);
+						System.out.println("siList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + scrName + " / " + 
+											sClass[q]+ " / " + sPrice[q]);
+
+					}
+					if(scNum == psize-1)
+						break;
+				}while(p_coden[scNum].substring(0,6).equals(p_coden[scNum+1].substring(0, 6)));
 				pcNum++;
 
 			}
