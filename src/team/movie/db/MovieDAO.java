@@ -29,7 +29,7 @@ public class MovieDAO {
 		String sql="";
 		try{
 			con=getConnection();
-			sql="select m1.movie_num, m1.name, m1.open_day, m2.image from movie m1,movie_detail m2 where m1.movie_num=m2.movie_num and curdate()<=date_add(m1.open_day, interval 1 month) and curdate()>=m1.open_day;";
+			sql="select m1.movie_num, m1.name, m1.open_day, m2.image, m1.age from movie m1,movie_detail m2 where playing = 1  and m1.movie_num = m2.movie_num";
 			pstmt=con.prepareStatement(sql);
 			rs=pstmt.executeQuery();
 			while(rs.next()){
@@ -37,6 +37,7 @@ public class MovieDAO {
 				mb.setMovie_num(rs.getString("movie_num"));
 				mb.setName(rs.getString("name"));
 				mb.setImage(rs.getString("image"));
+				mb.setAge(rs.getString("age"));
 				
 				v.add(mb);
 			}
@@ -51,20 +52,17 @@ public class MovieDAO {
 		return v;
 	}
 	
-	public boolean setPlaying(String nc_code){
+	public boolean setPlaying(String movie_num){
 		Connection con=null;
 		PreparedStatement pstmt = null;
 		String sql="";
-		
 		try{
 			con=getConnection();
 			
 			sql = "update movie set playing = 1 where movie_num = ?";
 			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, nc_code.substring(3));
-			
-			
-			
+			pstmt.setString(1, movie_num);
+			pstmt.executeUpdate();
 		}catch(Exception e){
 			System.out.println("setPlayingMovies : "+e);
 			
@@ -87,31 +85,31 @@ public class MovieDAO {
 			if(s_cate.equals("name")){
 				sql="select movie_num, name, director, production, open_day from movie "
 						+ "where curdate()<=date_add(open_day, interval 1 month) and curdate()>=open_day and "
-						+ "name like concat('%',?,'%') ";
+						+ "name like concat('%',?,'%') and playing =0";
 				pstmt=con.prepareStatement(sql);
 				pstmt.setString(1, s_movie);
 			}else if(s_cate.equals("director")){
 				sql="select movie_num, name, director, production, open_day from movie "
 						+ "where curdate()<=date_add(open_day, interval 1 month) and curdate()>=open_day and "
-						+ "director like concat('%',?,'%') ";
+						+ "director like concat('%',?,'%') and playing =0";
 				pstmt=con.prepareStatement(sql);
 				pstmt.setString(1, s_movie);
 			}else if(s_cate.equals("production")){
 				sql="select movie_num, name, director, production, open_day from movie "
 						+ "where curdate()<=date_add(open_day, interval 1 month) and curdate()>=open_day and "
-						+ "production like concat('%',?,'%') ";
+						+ "production like concat('%',?,'%') and playing =0";
 				pstmt=con.prepareStatement(sql);
 				pstmt.setString(1, s_movie);
 			}else if(s_cate.equals("all")){
 				if(s_movie == null){
 					sql="select movie_num, name, director, production, open_day from movie "
-							+ "where curdate()<=date_add(open_day, interval 1 month) and curdate()>=open_day";
+							+ "where curdate()<=date_add(open_day, interval 1 month) and curdate()>=open_day and playing =0";
 					pstmt=con.prepareStatement(sql);
 				} else {
 					sql="select movie_num, name, director, production, open_day from movie "
 							+ "where curdate()<=date_add(open_day, interval 1 month) and curdate()>=open_day and "
 							+ "(name like concat('%',?,'%') or director like concat('%',?,'%') or "
-							+ "production like concat('%',?,'%') or actor like concat('%',?,'%'))";
+							+ "production like concat('%',?,'%') or actor like concat('%',?,'%')) and playing =0";
 					pstmt=con.prepareStatement(sql);
 					pstmt.setString(1, s_movie);
 					pstmt.setString(2, s_movie);

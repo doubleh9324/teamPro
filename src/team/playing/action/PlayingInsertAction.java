@@ -9,7 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
+import team.movie.db.MovieDAO;
 import team.playing.db.PlayTimeBean;
 import team.playing.db.PlayingBean;
 import team.playing.db.PlayingDAO;
@@ -62,7 +62,7 @@ public class PlayingInsertAction implements Action{
 
 		for(int f=0; f<psize; f++){
 
-			p_num[f] = Integer.parseInt(p_coden[f].substring(6, 7));
+			p_num[f] = Integer.parseInt(p_coden[f].substring(6));
 			System.out.println(p_num[f]);
 		}
 		
@@ -94,8 +94,6 @@ public class PlayingInsertAction implements Action{
 				System.out.println("pcNum=0 :"+p);
 				System.out.println("playList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + nc_code + " / " + sday+ " / " + eday);
 				playList.add(pb);
-				
-
 				
 				//하나의 pcode에 3개의 등급
 				do{
@@ -224,74 +222,13 @@ public class PlayingInsertAction implements Action{
 					System.out.println("ptList 추가 : "+ping_num + " / " + cal.getTime() + " / " + time[k] );
 				}
 				cal.add(Calendar.DATE, 1);
-				
 		}
-
 			
-			/**
-			 * seatInfo table
-			
-			
-			//상영관 순서 리스트 seatInfo
-			p_num[i] = Integer.parseInt(p_coden[i].substring(6, 7));
-			System.out.println(p_coden[i].substring(6, 7));
-			int scrNum = 0;
-			
-			//하나의 ping_num에(현재 반복문에 ping_num제어 완료) 관 갯수만큼(p_num만큼)
-				
-			SeatInfoBean sib = new SeatInfoBean();
-			
-			if(scrNum==0){
-				//등급 3개
-				for(int q=0; q<3; q++){
-					
-					System.out.println(">>>>>>>>>>ping_num : "+ping_num);
-					//제일 처음엔 값 그대로 넣기
-					sib.setPing_num(ping_num);
-					sib.setP_code(p_code[pcNum]);
-					String scrName = playingDao.getScreenName(p_code[pcNum].substring(0,6), p_num[scrNum]);
-					sib.setScreen_name(scrName);
-					
-					String[] sClass = {"VIP", "R", "S"};
-					int[] sPrice = {11000, 9000, 8000};
-					sib.setSeatclass(sClass[q]);
-					sib.setPrice(sPrice[q]);
-					int cap = playingDao.getCapacity(p_code[pcNum]);
-					
-					//등급에 따라 가격 정하기
-					if(q==0){
-						//vip 10%
-						sib.setSeat_num((int)(cap*0.1));
-					}else if(q==1){
-						//R 30%
-						sib.setSeat_num((int)(cap*0.3));
-					}else if(q==2){
-						//S 60%
-						sib.setSeat_num((int)(cap*0.6));
-					}
-					
-					sib.setEvent_code("n");
-					
-					System.out.println("siList 추가 : "+ping_num + " / " + p_code[pcNum] + " / " + scrName + " / " + 
-										sClass[q]+ " / " + sPrice[q]);
-					
-				}
-			}else if((p_num[scrNum] > p_num[scrNum-1]) && scrNum>0){
-				//이전 숫자보다 현재 숫자가 클 때만 같은 p_code 넣기
-			}
-					
-				//관 갯수만큼 클래스 3개 (가격지정 같이)
-			
-			*/
-			 
-
-			
-
 	}
-
 		
-	//	for(int s=0; s<playList.size(); s++)
-	//	System.out.println(playList.get(s).getPing_num());
+		MovieDAO movieDao = new MovieDAO();
+		System.out.println(nc_code.substring(2));
+		movieDao.setPlaying(nc_code.substring(2));
 		
 		//dao 실행 후 결과값으로 성공 여부 조회
 		boolean pbRe=false;
@@ -306,7 +243,6 @@ public class PlayingInsertAction implements Action{
 			System.out.println("Playing & time & seatinfo 입력 에러");
 			return null;
 	}
-
 
 		ActionForward forward = new ActionForward();
 		

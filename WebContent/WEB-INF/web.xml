@@ -17,6 +17,8 @@
     <res-auth>Container</res-auth>
   </resource-ref>
   
+
+  
 <servlet>
     <servlet-name>PlaceFrontController</servlet-name>
     <servlet-class>team.place.action.PlaceFrontController</servlet-class>
@@ -34,6 +36,15 @@
   <servlet-mapping>
     <servlet-name>PlayingFrontController</servlet-name>
     <url-pattern>*.pg</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <servlet-name>ReservationFrontController</servlet-name>
+    <servlet-class>team.reservation.action.ReservationFrontController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReservationFrontController</servlet-name>
+    <url-pattern>*.rs</url-pattern>
   </servlet-mapping>
   
   

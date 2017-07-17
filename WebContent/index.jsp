@@ -170,6 +170,16 @@
 		<button>추가</button>
 		
 		</form>
+		
+		<h2>상영영화 예매</h2>
+		
+		<button onclick="reservation();">예매하기</button>
+		
+		<form action="./PlayingInsertAction.pg" method="post">
+		
+		
+		</form>
+		
 	
 <script type="text/javascript">
 
@@ -307,6 +317,10 @@ function searchPlace(){
 
 function searchContent(){
 	window.open("./searchMovie.mo","","width=500, height=300, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
+}
+
+function reservation(){
+	window.open("./reserveMV.rs","","width=1050, height=795, toolbar=no, menubar=no, scrollbars=no, resizable=yes");
 }
 
 </script>

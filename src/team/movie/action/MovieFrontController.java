@@ -68,6 +68,13 @@ public class MovieFrontController extends HttpServlet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}else if(command.equals("/getPlayingMovies.mo")){
+			action = new PlayingMovieListAction() ;
+			try {
+				forward= action.excute(req, resp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		//(���� �ּҷ� �̵�)

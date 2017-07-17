@@ -52,6 +52,7 @@ public class PlaceDAO {
 		return false;
 	}
 	
+	
 	public boolean insertPlace_detail(Place_detailBean pbb){
 		Connection con= null;
 		PreparedStatement pstmt = null;
@@ -125,6 +126,7 @@ public class PlaceDAO {
 		pb.setHomepage(rs.getString("homepage"));
 		return pb;
 	}
+	
 	
 	public boolean insertLocation(LocationBean lb){
 		Connection con= null;

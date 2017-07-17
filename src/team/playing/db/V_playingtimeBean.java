@@ -11,6 +11,7 @@ public class V_playingtimeBean {
 	private String start_day;
 	private String end_day;
 	private String time;
+	
 	public int getPing_num() {
 		return ping_num;
 	}
