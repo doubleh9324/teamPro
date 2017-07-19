@@ -1,8 +1,10 @@
-package team.reservation.action;
+package team.reservation.db;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,8 +14,10 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import team.movie.db.MovieBean;
+
 public class ReservationDAO {
-	
+	//여러가지 테이블을 건드려서 따로 만들긴 했는데 원래 DAO로 돌려놔야할지 고려할 것
 	private Connection getConnection() throws Exception{
 		Connection con=null;
 		Context init=new InitialContext();
@@ -62,33 +66,89 @@ public class ReservationDAO {
 	}
 	
 	//예매 화면에서 movie_num 넘겨줬을때 사용
-	public List<Map<String, Object>> getPlace(String mo_num){
+	public List<Map<String, Object>> getPlace(String flag, String value ){
 		Connection con= null;
 		PreparedStatement pstmt = null;
 		String sql="";
 		ResultSet rs = null;
 		List<Map<String, Object>> pcodeList = new ArrayList<>();
+		
+		System.out.println(flag+ value);
 		try{
 			con=getConnection();
 			
-			sql="select p_code from playing where nc_code = concat('mo',?) ";
+			if(flag.equals("movie")){
+				sql="select p_code from playing where nc_code = concat('mo',?) ";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, value);
+				rs = pstmt.executeQuery();
+				System.out.println(pstmt.toString());
+				if(rs.next()){
+					do{
+						Map<String, Object> resultMap = new HashMap<>();
+						
+						resultMap.put("p_code", rs.getString("p_code"));
+						pcodeList.add(resultMap);
+					}while(rs.next());
+				}
+				
+				return pcodeList;
+			} else if(flag.equals("date")){
+				System.out.println(value);
+				String d = value.substring(0, 4)+"-"+value.substring(4,6)+"-"+value.substring(6);
+				System.out.println(d);
+				sql="select p_code from playing where start_day <= date_format(now(), '%Y%m%d') and end_day >= date_format(?,'%Y%m%d');";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, d);
+				rs = pstmt.executeQuery();
+				System.out.println(pstmt.toString());
+				if(rs.next()){
+					do{
+						Map<String, Object> resultMap = new HashMap<>();
+						
+						resultMap.put("p_code", rs.getString("p_code"));
+						pcodeList.add(resultMap);
+					}while(rs.next());
+				}
+				
+				return pcodeList;
+			}
+		}catch(Exception e){
+			System.out.println("ReservDAO getplace(pcode) error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return null;
+	}
+	
+	public MovieBean getMovieInfo(String mo_num){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		MovieBean mb = new MovieBean();
+		
+		try{
+			con=getConnection();
+			
+			sql="select a.name, a.age, b.image from movie a, movie_detail b where a.movie_num= ? and a.movie_num = b.movie_num ";
 			pstmt=con.prepareStatement(sql);
 			pstmt.setString(1, mo_num);
 			rs = pstmt.executeQuery();
 			System.out.println(pstmt.toString());
 			if(rs.next()){
 				do{
-					Map<String, Object> resultMap = new HashMap<>();
-					
-					resultMap.put("p_code", rs.getString("p_code"));
-					pcodeList.add(resultMap);
+					mb.setImage(rs.getString("image"));
+					mb.setAge(rs.getString("age"));
+					mb.setName(rs.getString("name"));
 				}while(rs.next());
 			}
 			
-			return pcodeList;
+			return mb;
 			
 		}catch(Exception e){
-			System.out.println("ReservDAO getplace(pcode) error : "+e);
+			System.out.println("ReservDAO getMovieInfo error : "+e);
 		}finally{
 			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
@@ -146,5 +206,41 @@ public class ReservationDAO {
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
 		}
 		return null;
+	}
+	
+	public List<Map<String, Object>> getPlayDay() throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		List<Map<String, Object>> playdayList = new ArrayList<>();
+		try{
+			con=getConnection();
+			
+			sql="select distinct date_format(play_day, '%Y%m%d') as pday, year(play_day) as year, month(play_day) as month, dayofmonth(play_day) as day, dayname(play_day) as dayname "
+					+ "from playtime where play_day >= date_format(now(), '%Y%m%d')";
+			pstmt=con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+
+			if(rs.next()){
+				do{
+					Map<String, Object> playday = new HashMap<>();
+					playday.put("pday",rs.getString("pday"));
+					playday.put("year", rs.getString("year"));
+					playday.put("month", rs.getString("month"));
+					playday.put("day", rs.getString("day"));
+					playday.put("dayname", rs.getString("dayname"));
+					playdayList.add(playday);
+				}while(rs.next());
+			}
+			return playdayList;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO selectPlayday error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+	return null;
 	}
 }

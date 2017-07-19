@@ -210,6 +210,7 @@ public class PlayingInsertAction implements Action{
 			*/
 			//하나의 ping_num에 (= 하나의 p_code에)
 			//상영 날짜만큼
+			cal.setTime(sd);
 			for(int j=0; j<days; j++){
 				//3개의 time반복
 				for(int k=0; k<3; k++){

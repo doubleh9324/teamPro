@@ -1,5 +1,6 @@
 package team.reservation.action;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import team.place.db.PlaceDAO;
 import team.playing.db.PlayingDAO;
 import team.reservation.db.Action;
 import team.reservation.db.ActionForward;
+import team.reservation.db.ReservationDAO;
 
 public class ReservationAction implements Action{
 
@@ -30,12 +32,40 @@ public class ReservationAction implements Action{
 		List<MovieBean> movieList = movieDao.playingMovies();
 		List<Map<String, Object>> placeList = reserDao.getPlace();
 		List<Map<String, Object>> locationList = reserDao.getLocation();
-		Map<String, Object> locMap = new HashMap<>();
+		List<Map<String, Object>> playdayList = reserDao.getPlayDay();
+		
+		for(int i=0; i<playdayList.size(); i++){
+			String dayname = (String)playdayList.get(i).get("dayname");
+			switch(dayname){
+			case "Monday":
+				playdayList.get(i).put("dayname", "월");
+				break;
+			case "Tuesday":
+				playdayList.get(i).put("dayname", "화");
+				break;
+			case "Wednesday":
+				playdayList.get(i).put("dayname", "수");
+				break;
+			case "Thursday":
+				playdayList.get(i).put("dayname", "목");
+				break;
+			case "Friday":
+				playdayList.get(i).put("dayname", "금");
+				break;
+			case "Saturday":
+				playdayList.get(i).put("dayname", "토");
+				break;
+			case "Sunday":
+				playdayList.get(i).put("dayname", "일");
+				break;
+			}
+		}
 		
 	    
 	    request.setAttribute("movieList", movieList);
 	    request.setAttribute("placeList", placeList);
 	    request.setAttribute("locationList", locationList);
+	    request.setAttribute("playdayList", playdayList);
 	    
 	    ActionForward forward=new ActionForward();
 	    forward.setRedirect(false);

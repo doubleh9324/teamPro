@@ -26,185 +26,7 @@
 <link rel="stylesheet" href="http://img.cgv.co.kr/CGV_RIA/Ticket/Common/css/2017/06/CGV_YS/reservation_step3_step2.css" />
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
-
-<script type="text/javascript">
-/*
-$(document).ready(function(){
-	
-	//현재 상영중인 영화 목록 가져오기
-	 jQuery.ajax({
-         type:"POST",
-         url:"./getIndexSetInfo.pl",
-         dataType:"JSON",
-         success : function(data) {
-               // select 목록
-               var str = "";
-               var age= "";
-               var index = 0;
-               
-               var addlist = $("#movie_list > ul")
-               $.each(data.movieList, function(key, value){
-            	   
-            	   switch(value.age){
-            	   case 'all' :
-            		   age = 'rating-all';
-            		   break;
-            	   case '12' :
-            		   age = 'rating-12';
-            		   break;
-            	   case '15' :
-            		   age = 'rating-15';
-            		   break;
-            	   case '18' :
-            		   age = 'rating-18'
-            		   break;
-            	   }
-            	   
-            	   str += "<li class="+age+" data-index="+index+" movie_idx="+value.movie_num+">"+
-					"<a href='#' onclick='return false;''><span class='icon'>&nbsp;</span>" +
-					"<span class='text'>"+value.name+"</span><span class='sreader'></span></a></li>";
-            	   i++;
-               });
-               addlist.append(str);
-         },
-         complete : function(data) {
-               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-               // TODO
-         },
-         error : function(xhr, status, error) {
-               alert("에러발생");
-         }
-  	 });
-	
-	 jQuery.ajax({
-         type:"POST",
-         url:"./getIndexSetInfo.pg",
-         dataType:"JSON",
-         success : function(data) {
-	    		$("#ping_num").val(data.pnumMax);
-         },
-         complete : function(data) {
-               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-         },
-         error : function(xhr, status, error) {
-               alert("에러발생");
-         }
-  	 });
-	
-	
-	
-	
-	
-});
-
-*/
-
-function theaterAreaClickListener(event){
-	
-	//.theater-area-list > ul > li.selected > div
-	
-	//var id = String(event);
-	//$("#"+id).css("display", "block");
-
-//	console.log(event.relatedTarget.tagName);
-	$(".theater-area-list > ul > li.selected").removeClass("selected");
-	$(".area_theater_list > ul > li.selected").removeClass("selected");
-	
-	console.log(event.target.id);
-	 $("#"+event.target.id).parent().addClass("selected");
-	 console.log($("#"+event.target.id).parent().id);
-	 
-	 
-}
-
-
-function theaterListClickListener(event){
-	
-	$(".area_theater_list > ul > li.selected").removeClass("selected");
-	
-	console.log(event.target.data_index);
-	 $("#"+event.target.id).parent().addClass("selected");
-	 console.log($("#"+event.target.id).parent().id);
-	 
-}
-
-//특정 영화 선택시 그 영화가 상영하는 상영관 정보만 표시하기
-$(document).on("click",".movie-list > ul > li > a ", function(){
-	
-	$(".movie-list > ul > li.selected").removeClass("selected");
-	
-	console.log(this.id);
-	$("#"+this.id).parent().addClass("selected");
-	
-	
-	var movie_num = $(".movie-list > ul > li.selected").attr("movie_num");
-	
-	//해당하는 상영관 p_code 목록 받아오기
-	jQuery.ajax({
-        type:"POST",
-        url:"./getPlayingPcode.rs",
-        data:"mo_num="+movie_num,
-        dataType:"JSON",
-        success : function(data) {
-        	// TODO
-	    		//해당하는 pcodelist를 받아오면
-	    		//전체 상영관 중 pcode에 해당하지 않는 상영관 li에 dimmed 추가
-	    		//총 상영관 갯수 (p_code 갯수) 나중에 수정 할 것
-	    		//$(".area_theater_list > ul > li").length
-	    		var pcount = $(".area_theater_list > ul > li").length;
-        	
-        		window.alert("data받음");
-        		
-        		//현재 페이지에 있는 pcode 배열로 저장
-				var p= [];
-				$(".area_theater_list > ul > li").each(function(i) {
-					  p[i] = $(this).attr('p_code');
-				});
-				
-				
-				//모든 상영관에 추가 후 검색하여 없애기
-				//다른 방법이 있나 찾아보자
-				$(".area_theater_list > ul > li").addClass("dimmed");
-	    				 
-	   			 $.each(data.pcodeList, function(key, value){
-				//i번째 li의  p_code값이 목록에 존재하는 pcode값과 같지 않으면 dimmed추가
-				//같은게 생기면 break;
-				
-				//	window.alert($("li[p_code="+p[i]+"]").attr("data-index"));
-					if($("li[p_code="+value.p_code+"]").hasClass("dimmed"))
-						{$("li[p_code="+value.p_code+"]").removeClass("dimmed");
-						
-						}else
-							$("li[p_code="+value.p_code+"]").addClass("dimmed");
-				
-                });
-
-	    		
-	    		//총 카운트 지정하기
-	    		var cnt= [];
-	    		for(var j=1; j<=9; j++){
-	    		 	cnt[j] = $("li[areaindex ="+j+"][class!='dimmed']").length;
-	    		 	window.alert(cnt[j]);
-	    		 	$(".theater-area-list > ul > li[areaindex ="+j+"] > a > span").text(cnt[j]);
-	    		}
-	    		
-	    		
-	    		$(".theater-area-list > ul > li > a > span").each(function(i) {
-					  $(this).text(cnt[i+1]);
-				});
-        },
-        complete : function(data) {
-              // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-        },
-        error : function(xhr, status, error) {
-              alert("에러발생");
-        }
- 	 });
-});
-
-</script>
-
+<script type="text/javascript" src="js/reservation.js"></script>
 
 </head>
 
@@ -363,9 +185,9 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 									<span class="side on"></span>
 									<a href="#" onclick="return false;" class="button menu1 selected">전체</a>
 									<span class="side on"></span>
-									<a href="#" onclick="return false;" class="button menu2">아트하우스</a>
+									<a href="#" onclick="return false;" class="button menu2"></a>
 									<span class="side"></span>
-									<a href="#" onclick="return false;" class="button menu3">특별관</a>
+									<a href="#" onclick="return false;" class="button menu3"></a>
 									<span class="side"></span>
 								</div>
 								<!-- 영화관 리스트 -->
@@ -421,7 +243,31 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 						<div class="col-body">
 							<!-- 날짜선택 -->
 							<div class="date-list nano" id="date_list">
-								<ul class="content scroll-y"></ul>
+								<ul class="content scroll-y">
+									<div>
+										<c:set var="dindex" value="1"/>
+										<c:forEach var="playday" items="${playdayList}" varStatus="status">
+											<c:if test="${playday.month != preMonth }">
+												<li class="month dimmed">
+													<div>
+														<span class="year">${playday.year }</span>
+														<span class="month">${playday.month }</span>
+														<div></div>
+													</div>
+												</li>
+											</c:if>
+											<li data-index="${dindex }" date="${playday.pday }" class="day">
+												<a href="#" onclick="return false;">
+													<span class="dayweek">${fn:substring(playday.dayname,0,2) }</span>
+													<span class="day">${playday.day }</span>
+													<span class="sreader"></span>
+												</a>
+											</li>
+												<c:set var="dindex" value="${dindex + 1 }"/>
+												<c:set var="preMonth" value="${playday.month }"/>
+										</c:forEach>								
+									</div>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -434,9 +280,34 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 						<div class="col-body">
 							<!-- 시간선택 -->
 							<div class="time-option">
-								<span class="morning">조조</span><span class="night">심야</span>
+								<span class="morning">조조</span>
+								<span class="night">심야</span>
 							</div>
 							<div class="placeholder">영화, 극장, 날짜를 선택해주세요.</div>
+							<div class="time-list nano has-scrollbar">
+								<div class="content scroll-y" tabindex="-1" style="right: -17px;">
+									<div class="theater" screen_cd="003" movie_cd="20013089" style="border: none;">
+										<span class="title">
+											<span class="name">2D</span>
+											<span class="floor">3관 8층</span>
+											<span class="seatcount">(총172석)</span>
+										</span>
+										<ul>
+											<li data-index="0" data-remain_seat="172" play_start_tm="0630" screen_cd="003" movie_cd="20013089" play_num="1" class="morning">
+												<a class="button" href="#" onclick="screenTimeClickListener(event);return false;" title="">
+													<span class="time">
+														<span>06:30</span>
+													</span>
+													<span class="count">151석</span>
+													<div class="sreader">종료시간 08:52</div>
+													<span class="sreader mod"> 조조</span>
+												</a>
+											</li>
+										</ul>
+										</div>
+										</div>
+										</div>
+										
 						</div>
 					</div>
 				</div>
@@ -632,18 +503,21 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 					<div class="noscript"><span>현재 사용중인 환경에서는 스크립트 동작이 활성화되지 않아 예매 서비스를 이용하실 수 없습니다.<br/>예매 서비스를 이용하기 위해서는 <a href='http://www.enable-javascript.com/ko/' rel='nofollow'>스크립트 동작을 활성화</a> 해주세요.</span></div>
 				</noscript>
 			</div>
+			
+			<!-- bottom bar -->
 			<div class="tnb_area">
 				<div class="tnb_container">
 				<div class="tnb_reset_btn"><a href="#" onmousedown="javascript:logClick('옵션/예매다시하기');" onclick="ticketRestart();return false;">예매 다시하기</a></div>
 				<div class="tnb step1">
 					<!-- btn-left -->
-					<a class="btn-left" href="#" onclick="OnTnbLeftClick(); return false;" title="">이전단계로 이동</a>
+				<a class="btn-left" href="#" onclick="OnTnbLeftClick(); return false;" title="영화선택">이전단계로 이동</a>
+				
 					<div class="info movie">
-						<span class="movie_poster"><img src="" alt="영화 포스터" /></span>
+						<span class="movie_poster"><img src alt="영화 포스터"/></span>
 						<div class="row movie_title colspan2">
 							<span class="data letter-spacing-min ellipsis-line2"><a href="#" target="_blank" onmousedown="javascript:logClick('SUMMARY/영화상세보기');" title="새창열기">영화정보 상세보기</a></span>
 						</div>
-						<div class="row movie_type">
+						<div id="test" class="row movie_type">
 							<span class="data ellipsis-line1"></span>
 						</div>
 						<div class="row movie_rating">

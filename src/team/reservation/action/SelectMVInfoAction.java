@@ -8,26 +8,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import team.movie.db.MovieBean;
 import team.reservation.db.Action;
 import team.reservation.db.ActionForward;
 import team.reservation.db.ReservationDAO;
 
-public class ReservationInfoSelectAction implements Action{
+public class SelectMVInfoAction implements Action{
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		//movie_num 가져오기
+		String mo_num = request.getParameter("mo_num");
 		
-		//flag 가져와서 date면 날짜 기준으로 상영관 movie면 영화 기준으로 상영관
-		String flag = request.getParameter("flag");
-		String value = request.getParameter("val");
-		
-		//해당하는 번호로 p_code 검색
+		//해당하는 번호 영화검색
 		ReservationDAO resDao = new ReservationDAO();
-		List<Map<String, Object>> pcodeList = resDao.getPlace(flag, value);
+		
+		MovieBean mb = new MovieBean();
+		mb = resDao.getMovieInfo(mo_num);
+		
 		
 		JSONObject jsonObject = new JSONObject();
 		JSONArray jsona = new JSONArray();
-		jsonObject.put("pcodeList", pcodeList);
+		
+		jsonObject.put("movieInfo", mb);
 		
 		ActionForward forward=new ActionForward();
 		forward.setRedirect(false);

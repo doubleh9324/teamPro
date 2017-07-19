@@ -49,7 +49,7 @@ public class ReservationFrontController extends HttpServlet{
 		Action action = null;
 		
 		if(command.equals("/reserveMV.rs")){
-				action = new ReservationAction();
+			action = new ReservationAction();
 			try {
 				forward= action.execute(request, response);
 			} catch (Exception e) {
@@ -57,12 +57,21 @@ public class ReservationFrontController extends HttpServlet{
 			}
 		}else if(command.equals("/getPlayingPcode.rs")){
 			action = new ReservationInfoSelectAction();
-		try {
-			forward= action.execute(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/getPlayingMV.rs")){
+			action = new SelectMVInfoAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-	}
+		
+		
 		
 		if(forward!=null){//new ActionForward()��ü�� �����ϰ�...
 			if(forward.isRedirect()){//true->sendRedirect()���
