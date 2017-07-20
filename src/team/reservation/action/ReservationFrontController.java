@@ -56,7 +56,7 @@ public class ReservationFrontController extends HttpServlet{
 				e.printStackTrace();
 			}
 		}else if(command.equals("/getPlayingPcode.rs")){
-			action = new ReservationInfoSelectAction();
+			action = new ReserTheaterInfoSelectAction();
 			try {
 				forward= action.execute(request, response);
 			} catch (Exception e) {
@@ -64,6 +64,13 @@ public class ReservationFrontController extends HttpServlet{
 			}
 		}else if(command.equals("/getPlayingMV.rs")){
 			action = new SelectMVInfoAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/getPlayingMonum.rs")){
+			action = new ReserMovieInfoSelectAction();
 			try {
 				forward= action.execute(request, response);
 			} catch (Exception e) {

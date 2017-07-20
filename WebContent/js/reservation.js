@@ -14,8 +14,6 @@ $(document).ready(function(){
 	//영화선택, 극장선택, 좌석선택 글씨 block
 	$("div[class='placeholder'] ").css("display","block");
 	
-	
-
 	//요일에 따른 클래스 추가
 	$(".dayweek").each(function(i){
 		if($(this).text() == '토'){
@@ -42,10 +40,7 @@ function theaterAreaClickListener(event){
 	$(".theater-area-list > ul > li.selected").removeClass("selected");
 	$(".area_theater_list > ul > li.selected").removeClass("selected");
 	
-	console.log(event.target.id);
-	 $("#"+event.target.id).parent().addClass("selected");
-	 console.log($("#"+event.target.id).parent().id);
-	 
+	$("#"+event.target.id).parent().addClass("selected");
 	 
 }
 
@@ -59,9 +54,6 @@ function theaterListClickListener(event){
 	
 	//선택한 극장 상위 태그(li) 
 	$("#"+event.target.id).parent().addClass("selected");
-	
-	
-
 	
 	//극장 글자 block, 극장이름 띄우기
 	$(".theater > div").css("display", "block");
@@ -77,6 +69,7 @@ function theaterListClickListener(event){
 /*===================================================
  * 특정 영화 선택
  */
+
 $(document).on("click",".movie-list > ul > li > a ", function(){
 	
 	//선택하지 않은 영화들 클래스 제거
@@ -113,22 +106,22 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 				$(".area_theater_list > ul > li").addClass("dimmed");
 	    				 
 	   			 $.each(data.pcodeList, function(key, value){
-				//i번째 li의  p_code값이 목록에 존재하는 pcode값과 같지 않으면 dimmed추가
-				//같은게 생기면 break;
-				
-				//	window.alert($("li[p_code="+p[i]+"]").attr("data-index"));
-					if($("li[p_code="+value.p_code+"]").hasClass("dimmed"))
-						{$("li[p_code="+value.p_code+"]").removeClass("dimmed");
-						}else
-							$("li[p_code="+value.p_code+"]").addClass("dimmed");
+					if($("li[p_code="+value.p_code+"]").hasClass("dimmed")){
+						$("li[p_code="+value.p_code+"]").removeClass("dimmed");
+					}else{
+
+					}
                 });
 
 	    		//총 카운트 지정하기
 	    		var cnt= [];
 	    		for(var j=1; j<=9; j++){
+	    			//지역이름에 해당하는 요소 지정하기
 	    			var parUl =  $("li[areaindex ="+j+"][class!='dimmed']").parent();
 	    			var pcode = "";
+	    			//예매 가능한 상영관의 갯수를 찾아서 배열에 저장
 	    		 	cnt[j] = $("li[areaindex ="+j+"][class!='dimmed']").length;
+	    		 	//예매 가능한 상영관을 위쪽으로 배치
 	    		 	$("li[areaindex ="+j+"][class!='dimmed']").each(function(i){
 	    		 		pcode = $(this).attr("p_code");
 	    		 		
@@ -141,8 +134,14 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 					  $(this).text(cnt[i+1]);
 				});
 	    		
+	    	//	
 	    		
-	    		//현재 상영중인 영화관만 상위 목록으로 올리기
+	    		
+				$(".area_theater_list > ul > li.selected").removeClass("selected");
+				$(".theater-area-list > ul > li.selected").removeClass("selected");
+	    		
+	    		
+	    		
         },
         complete : function(data) {
               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
@@ -151,13 +150,12 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
               alert("에러발생");
         }
  	 });
-
-    
+	
     //글자없애고 포스터 띄우기
     $("div[class='placeholder'][title='영화선택'] ").css("display","none");
     $("span[class='movie_poster']").css("display", "inline");
     
-	//해당 영화에 대한 정보 받아오기
+	//해당 영화에 대한 정보 받아오기 (마지막 날짜 포함)
 	jQuery.ajax({
         type:"POST",
         url:"./getPlayingMV.rs",
@@ -176,6 +174,7 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
         	//이름 지정
         	//a태그 추가해서 상세정보 화면으로 넘어가도록 수정할것
         	$(".movie_title > span").css("display", "block").text(data.movieInfo.name);
+        	
         	//등급지정
         	var age = "";
         	if(data.movieInfo.age == 'all'){
@@ -187,6 +186,23 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
         	}
         	$(".movie_rating > span").text(age).css("display", "block");
         	
+        	//날짜 지정
+        	var duration = data.duration;
+        	var sindex = $(".date-list > ul > div > li[date="+duration[0].replace(/-/g, '')+"]").attr("data-index");
+        	var eindex = $(".date-list > ul > div > li[date="+duration[1].replace(/-/g, '')+"]").attr("data-index");
+        	
+        	//시작일자가 오늘 날짜보다 이전이면 
+        	if(typeof sindex=="undefined"){
+        		sindex = 0;
+        	}
+        	
+    		//전체날짜를 dimmed하고
+    		$(".date-list > ul > div > li").addClass("dimmed");
+    		
+    		//해당하는 인덱스사이의 값은 dimmed 제거
+    		for(var d=sindex; d<=eindex; d++){
+    			$(".date-list > ul > div > li[data-index="+d+"]").removeClass("dimmed");
+    		}
         },
         complete : function(data) {
         },
@@ -198,11 +214,11 @@ $(document).on("click",".movie-list > ul > li > a ", function(){
 /*===================================================
  * 특정 날짜 선택
  */
-// TODO
+
 $(document).on("click",".date-list > ul > div > li > a ", function(){
 	//선택하지 않은 날짜들 클래스 제거
 	$(".date-list > ul > div > li.selected").removeClass("selected");
-	
+
 	//선택한 날짜 클래스 추가
 	$(this).parent().addClass("selected");
 	
@@ -210,7 +226,7 @@ $(document).on("click",".date-list > ul > div > li > a ", function(){
 	
 	var vdate = pdate.substring(0,4)+"년 "+pdate.substring(4,6)+"월 "+pdate.substring(6)+"일";
 	
-	//극장 글자 block, 극장이름 띄우기
+	//header 글씨 띄우기
 	$(".theater div").css("display", "block");
 	//극장선택 글씨 none
 	$("div[class='placeholder'][title='극장선택'] ").css("display","none");
@@ -219,13 +235,33 @@ $(document).on("click",".date-list > ul > div > li > a ", function(){
 	$(".row.date span[class='data']").text(vdate);
 
 	
-	//앞의 영화, 상영관이 선택되지 않은 경우에 날짜를 선택하면 해당 날짜에 상영하는 영화가 있는 상영관만 표시하기
-	if(!$(".area_theater_list > ul > div > li").hasClass("selected")){
+	//앞의 영화, 상영관이 선택되었는지 여부 selected된 li가 있으면 ture 반환
+	var isSelectedMovie = false;
+	var isSelectedTheater = false ; 
+		
+	$(".area_theater_list > ul > div > li").each(function(i){
+		if($(this).hasClass("rating-18"))
+			isSelectedTheater = true;
+		console.log(isSelectedTheater);
+	});
 	
+	$(".movie-list > ul > li").each(function(i){
+		if($(this).hasClass("selected"))
+			isSelectedMovie = true;
+		console.log(isSelectedTheater);
+	});
+	
+	
+	//영화, 상영관이 선택되지 않았으면
+	if(!isSelectedMovie && !isSelectedTheater){
+		
+		window.alert("수정");
+		//해당하는 날짜에 상영하는 영화가 있는 상영관만 표시
 		jQuery.ajax({
 	        type:"POST",
 	        url:"./getPlayingPcode.rs",
 	        data:"val="+pdate+"&flag="+"date",
+	        async : false,
 	        dataType:"JSON",
 	        success : function(data) {
 		    		//해당하는 pcodelist를 받아오면
@@ -246,17 +282,15 @@ $(document).on("click",".date-list > ul > div > li > a ", function(){
 					$(".area_theater_list > ul > li").addClass("dimmed");
 		    				 
 		   			 $.each(data.pcodeList, function(key, value){
-					//i번째 li의  p_code값이 목록에 존재하는 pcode값과 같지 않으면 dimmed추가
-					//같은게 생기면 break;
-					
-					//	window.alert($("li[p_code="+p[i]+"]").attr("data-index"));
-						if($("li[p_code="+value.p_code+"]").hasClass("dimmed"))
-							{$("li[p_code="+value.p_code+"]").removeClass("dimmed");
-							}else
-								$("li[p_code="+value.p_code+"]").addClass("dimmed");
+						if($("li[p_code="+value.p_code+"]").hasClass("dimmed")){
+							$("li[p_code="+value.p_code+"]").removeClass("dimmed");
+						}else {
+				    		$(".theater-area-list > ul > li.selected").removeClass("selected");
+				    		$(".area_theater_list > ul > li.selected").removeClass("selected");
+						}
 	                });
 	
-		    		//총 카운트 지정하기
+		    		//지역(총 카운트) 지정하기
 		    		var cnt= [];
 		    		for(var j=1; j<=9; j++){
 		    			var parUl =  $("li[areaindex ="+j+"][class!='dimmed']").parent();
@@ -274,14 +308,85 @@ $(document).on("click",".date-list > ul > div > li > a ", function(){
 						  $(this).text(cnt[i+1]);
 					});
 		    		
-		    		//현재 상영중인 영화관만 상위 목록으로 올리기
+		    		
+		    		// 
+
+		    		
+		    		window.alert($(".area_theater_list > ul > li[class='selected']").attr("data-index"));
+		    		$(".theater-area-list > ul > li[class='dimmed']").each(function(i){
+		    			window.alert($(this).attr("data-index"));
+		    			if($(this).hasClass("selected"))
+		    				$(this).removeClass("selected");
+		    		});
 	        },
 	        complete : function(data) {
 	              // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
 	        },
 	        error : function(xhr, status, error) {
-	              alert("에러발생");
+	              alert("getPlayingPcode date 에러발생");
 	        }
 	 	 });
+		
+		// 
+		
+
+		//해당하는 날짜에 상영하는 영화만 표시
+		jQuery.ajax({
+	        type:"POST",
+	        url:"./getPlayingMonum.rs",
+	        async : false,
+	        data:"val="+pdate+"&flag="+"date",
+	        dataType:"JSON",
+	        success : function(mdata) {
+	        	//해당 날짜에 상영하는 영화 번호 리스트를 받아오면
+	    		//전체 영화 중 해당하지 않는 영화 li에 dimmed 추가
+		    	var mocount = $(".movie-list > ul > li").length;
+		    	
+		    	//현재 존재하는 movie_num 배열로 저장
+		    	var m = [];
+		    	$(".movie-list > ul > li").each(function(i) {
+					  m[i] = $(this).attr('movie_num');
+				});
+		    	//모든 영화를 비활성화 시킨 후
+		    	$(".movie-list > ul > li").addClass("dimmed");
+		    	
+		    	
+		    	$.each(mdata.monumList, function(key, value){
+		    		if($("li[movie_num="+value.movie_num+"]").hasClass("dimmed")){
+		    			$("li[movie_num="+value.movie_num+"]").removeClass("dimmed");
+		    			console.log("if");
+					}else{
+						//$("li[movie_num="+value.movie_num+"]").addClass("dimmed");
+					}
+		    	});
+		    	
+		    	
+		    	//순서 재정리하기
+		    	for(var j=0; j<=mocount; j++){
+	    			var moUl =  $(".movie-list > ul");
+	    			var movie_num = "";
+	    			$(".movie-list > ul > li[class!='dimmed']").each(function(i){
+	    		 		movie_num = $(this).attr("movie_num");
+	    		 		//window.alert($(".movie_list > ul > li[class!='dimmed']").attr("movie_num"));
+	    		 		moUl.prepend($("li[movie_num="+movie_num+"]"));
+	    		 	});		    	
+		    	}
+    		 		
+    		 		
+	        },
+	        complete : function(data) {
+	              // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
+	        },
+	        error : function(xhr, status, error) {
+	              alert("getPlayingMonum date 에러발생");
+	        }
+	 	 });
+	 	 
+	 	 
+	}else if(!isSelectedMovie && isSelectedTheater){
+		//영화선택없고 상영관만 선택되어있으면
+		//선택된 상영관이 해당 날짜에 상연이 있으면 그대로 두고 (dimmed추가, 순서 재정렬만) 
+		//상연이 없으면 selected 제거하기
+		
 	}
 });

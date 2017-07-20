@@ -12,22 +12,21 @@ import team.reservation.db.Action;
 import team.reservation.db.ActionForward;
 import team.reservation.db.ReservationDAO;
 
-public class ReservationInfoSelectAction implements Action{
+public class ReserMovieInfoSelectAction implements Action{
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
-		//flag 가져와서 date면 날짜 기준으로 상영관 movie면 영화 기준으로 상영관
+		//flag 가져와서 date면 날짜 기준으로 영화 theater면 상영관 기준으로 영화
 		String flag = request.getParameter("flag");
 		String value = request.getParameter("val");
 		
 		//해당하는 번호로 p_code 검색
 		ReservationDAO resDao = new ReservationDAO();
-		List<Map<String, Object>> pcodeList = resDao.getPlace(flag, value);
+		List<Map<String, Object>> monumList = resDao.getMovie(flag, value);
 		
 		JSONObject jsonObject = new JSONObject();
-		JSONArray jsona = new JSONArray();
-		jsonObject.put("pcodeList", pcodeList);
+		jsonObject.put("monumList", monumList);
 		
 		ActionForward forward=new ActionForward();
 		forward.setRedirect(false);
@@ -38,9 +37,6 @@ public class ReservationInfoSelectAction implements Action{
 		
 		return null;	
 	
-		//ActionForward forward=new ActionForward();
-	//	forward.setRedirect(false);
-	//	forward.setPath("./index.jsp");
 		
 	}
 }

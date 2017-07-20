@@ -65,7 +65,7 @@ public class ReservationDAO {
 		return null;
 	}
 	
-	//예매 화면에서 movie_num 넘겨줬을때 사용
+	//예매 화면에서 movie_num 또는 date 넘겨줬을때 사용
 	public List<Map<String, Object>> getPlace(String flag, String value ){
 		Connection con= null;
 		PreparedStatement pstmt = null;
@@ -91,7 +91,6 @@ public class ReservationDAO {
 						pcodeList.add(resultMap);
 					}while(rs.next());
 				}
-				
 				return pcodeList;
 			} else if(flag.equals("date")){
 				System.out.println(value);
@@ -114,7 +113,7 @@ public class ReservationDAO {
 				return pcodeList;
 			}
 		}catch(Exception e){
-			System.out.println("ReservDAO getplace(pcode) error : "+e);
+			System.out.println("ReservDAO getplace error : "+e);
 		}finally{
 			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
@@ -122,6 +121,65 @@ public class ReservationDAO {
 		return null;
 	}
 	
+	//예매 화면에서 theater 또는 date 넘겨줬을때 사용
+	public List<Map<String, Object>> getMovie(String flag, String value ){
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		List<Map<String, Object>> monumList = new ArrayList<>();
+		
+		System.out.println(flag+ value);
+		try{
+			con=getConnection();
+			
+			//상영관 기준(p_code)으로 상영하는 영화 번호 목록 가져오기
+			if(flag.equals("theater")){
+				sql="select substring(nc_code, 3) as movie_num from playing where p_code = ? ";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, value);
+				rs = pstmt.executeQuery();
+				System.out.println(pstmt.toString());
+				if(rs.next()){
+					do{
+						Map<String, Object> resultMap = new HashMap<>();
+						
+						resultMap.put("movie_num", rs.getString("movie_num"));
+						monumList.add(resultMap);
+					}while(rs.next());
+				}
+				
+				return monumList;
+			} else if(flag.equals("date")){
+				//날짜 기준으로 상영하는 영화 번호 목록 가져오기
+				System.out.println(value);
+				String d = value.substring(0, 4)+"-"+value.substring(4,6)+"-"+value.substring(6);
+				System.out.println(d);
+				sql="select distinct substring(nc_code, 3) as movie_num from playing where start_day <= date_format(now(), '%Y%m%d') and end_day >= date_format(?,'%Y%m%d');";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, d);
+				rs = pstmt.executeQuery();
+				System.out.println(pstmt.toString());
+				if(rs.next()){
+					do{
+						Map<String, Object> resultMap = new HashMap<>();
+						System.out.println(rs.getString("movie_num"));
+						resultMap.put("movie_num", rs.getString("movie_num"));
+						monumList.add(resultMap);
+					}while(rs.next());
+				}
+				
+				return monumList;
+			}
+		}catch(Exception e){
+			System.out.println("ReservDAO getMovie error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+		return null;
+	}
+
 	public MovieBean getMovieInfo(String mo_num){
 		Connection con= null;
 		PreparedStatement pstmt = null;
@@ -142,6 +200,7 @@ public class ReservationDAO {
 					mb.setImage(rs.getString("image"));
 					mb.setAge(rs.getString("age"));
 					mb.setName(rs.getString("name"));
+					
 				}while(rs.next());
 			}
 			
@@ -237,6 +296,34 @@ public class ReservationDAO {
 					
 		}catch(Exception e){
 			System.out.println("ReserDAO selectPlayday error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+	return null;
+	}
+	
+	public String[] getPlayDay(String mo_num) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		
+		try{
+			con=getConnection();
+			
+			sql="select distinct start_day, end_day from playing where nc_code = concat('mo',?)";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, mo_num);
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			String[] duration = {rs.getString(1), rs.getString(2)};
+			return duration;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO selectPlayday(mo_num) error : "+e);
 		}finally{
 			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
