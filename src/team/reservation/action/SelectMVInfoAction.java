@@ -25,7 +25,7 @@ public class SelectMVInfoAction implements Action{
 		
 		MovieBean mb = new MovieBean();
 		mb = resDao.getMovieInfo(mo_num);
-		String[] duration = resDao.getPlayDay(mo_num);
+		String[] duration = resDao.getPlayDay("movie", mo_num);
 		
 		
 		JSONObject jsonObject = new JSONObject();

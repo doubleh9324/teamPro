@@ -58,7 +58,7 @@
 			<!-- 메인컨텐츠 -->
 			<div class="steps">
 				<!-- step1 -->
-				<div class="step step1" style="display:none;">
+				<div class="step step1">
 					<!-- MOVIE 섹션 -->
 					<div class="section section-movie">
 						<!-- col-head -->
@@ -313,7 +313,7 @@
 				</div>
 				<!-- //step1 -->
 				<!-- step2 -->
-				<div class="step step2" style="display:block;">
+				<div class="step step2" >
 					<!-- SEAT 섹션 -->
 					<div class="section section-seat">
 						<div class="col-head" id="skip_seat_list">
@@ -341,48 +341,6 @@
 													<li data-count="6"><a href="#" onclick="return false;"><span class="sreader mod">일반</span>6<span class='sreader'>명</span></a></li>
 													<li data-count="7"><a href="#" onclick="return false;"><span class="sreader mod">일반</span>7<span class='sreader'>명</span></a></li>
 													<li data-count="8"><a href="#" onclick="return false;"><span class="sreader mod">일반</span>8<span class='sreader'>명</span></a></li>
-												</ul>
-											</div>
-											<div class="group youth" id="nop_group_youth">
-												<span class="title">청소년</span>
-												<ul>
-													<li data-count="0" class="selected"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>0<span class='sreader'>명</span></a></li>
-													<li data-count="1"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>1<span class='sreader'>명</span></a></li>
-													<li data-count="2"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>2<span class='sreader'>명</span></a></li>
-													<li data-count="3"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>3<span class='sreader'>명</span></a></li>
-													<li data-count="4"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>4<span class='sreader'>명</span></a></li>
-													<li data-count="5"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>5<span class='sreader'>명</span></a></li>
-													<li data-count="6"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>6<span class='sreader'>명</span></a></li>
-													<li data-count="7"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>7<span class='sreader'>명</span></a></li>
-													<li data-count="8"><a href="#" onclick="return false;"><span class="sreader mod">청소년</span>8<span class='sreader'>명</span></a></li>
-												</ul>
-											</div>
-											<div class="group child" id="nop_group_child">
-												<span class="title">어린이</span>
-												<ul>
-													<li data-count="0" class="selected"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>0<span class='sreader'>명</span></a></li>
-													<li data-count="1"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>1<span class='sreader'>명</span></a></li>
-													<li data-count="2"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>2<span class='sreader'>명</span></a></li>
-													<li data-count="3"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>3<span class='sreader'>명</span></a></li>
-													<li data-count="4"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>4<span class='sreader'>명</span></a></li>
-													<li data-count="5"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>5<span class='sreader'>명</span></a></li>
-													<li data-count="6"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>6<span class='sreader'>명</span></a></li>
-													<li data-count="7"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>7<span class='sreader'>명</span></a></li>
-													<li data-count="8"><a href="#" onclick="return false;"><span class="sreader mod">어린이</span>8<span class='sreader'>명</span></a></li>
-												</ul>
-											</div>
-											<div class="group special hide" id="nop_group_sepcial">
-												<span class="title">우대</span>
-												<ul>
-													<li data-count="0" class="selected"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>0<span class='sreader'>명</span></a></li>
-													<li data-count="1"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>1<span class='sreader'>명</span></a></li>
-													<li data-count="2"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>2<span class='sreader'>명</span></a></li>
-													<li data-count="3"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>3<span class='sreader'>명</span></a></li>
-													<li data-count="4"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>4<span class='sreader'>명</span></a></li>
-													<li data-count="5"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>5<span class='sreader'>명</span></a></li>
-													<li data-count="6"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>6<span class='sreader'>명</span></a></li>
-													<li data-count="7"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>7<span class='sreader'>명</span></a></li>
-													<li data-count="8"><a href="#" onclick="return false;"><span class="sreader mod">우대</span>8<span class='sreader'>명</span></a></li>
 												</ul>
 											</div>
 										</div>
@@ -415,11 +373,11 @@
 									-->
 									<div id="user-select-info">
 										<p class="theater-info">
-											<span class="site">CGV 천왕성</span>
-											<span class="screen">11층 8관 [Business]</span>
-											<span class="seatNum">남은좌석  <b class="restNum">100</b>/<b class="totalNum">900</b></span>
+											<span class="site"></span>
+											<span class="screen"></span>
+											<span class="seatNum"> <b class="restNum">100</b>/<b class="totalNum">900</b></span>
 										</p>
-										<p class="playYMD-info"><b>2017.04.10</b><b class="exe">(월)</b><b>00:00 - 00:00</b></p>
+										<p class="playYMD-info"></p>
 									</div>	
 									<a class="change_time_btn" href="#" onmousedown="if(event.stopPropagation){event.stopPropagation();}return false;" onclick="ticketStep2TimeSelectPopupShow();return false;"><span>상영시간 변경하기</span></a>
 								</div>

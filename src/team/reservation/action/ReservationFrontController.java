@@ -76,6 +76,20 @@ public class ReservationFrontController extends HttpServlet{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}else if(command.equals("/getPlayingDate.rs")){
+			action = new ReserDateInfoSelectAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(command.equals("/getPlayingTime.rs")){
+			action = new ReserTimeInfoSelectAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		
