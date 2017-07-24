@@ -15,9 +15,9 @@
 <meta http-equiv="imagetoolbar" content="no" />
 <meta name="keywords" content="CGV, 시지브이, 영화관, 극장, 영화, 티켓, 박스오피스, 극장, Movie, Theater, Cinema, Cgv, cgv, 예매, 상영작" />
 <meta name="description" content="영화 그 이상의 감동. CGV" />
-<title>CGV 빠른예매</title>
+<title>TicketLion 영화예매</title>
 <link rel="stylesheet" href="http://img.cgv.co.kr/CGV_RIA/Ticket/Common/css/2017/06/CGV_YS/common.css" />
-<link rel="stylesheet" href="http://img.cgv.co.kr/CGV_RIA/Ticket/Common/css/2017/06/CGV_YS/reservation.css" />
+<link rel="stylesheet" href="css/reservation.css">
 <link rel="stylesheet" href="http://img.cgv.co.kr/CGV_RIA/Ticket/Common/css/2017/06/CGV_YS/reservation_tnb.css" />
 <link rel="stylesheet" href="http://img.cgv.co.kr/CGV_RIA/Ticket/Common/css/2017/06/CGV_YS/reservation_popup.css" />
 <link rel="stylesheet" href="http://img.cgv.co.kr/CGV_RIA/Ticket/Common/css/2017/06/CGV_YS/reservation_step3.css" />
@@ -388,7 +388,7 @@
 									<div class="content">
 										<div class="screen" title="SCREEN"><span class="text"></span></div>
 										<div class="seats" id="seats_list" style="width: 240px; height: 192px;">
-											<div>
+											<div class="rows">
 												<div class="row" style="top:0px;">
 												<div class="label">A</div>
 												<a href="#" onclick="skipToNextRow(event);return false;" class="skip_row">A열 건너뛰기</a>

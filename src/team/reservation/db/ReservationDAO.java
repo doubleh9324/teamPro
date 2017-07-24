@@ -426,7 +426,7 @@ public class ReservationDAO {
 			//나중에 예매 구현하고나면 실제로 남은 잔여석을 가져오도록 수정
 			sql = "select distinct a.screen_name , b.ptime , c.capacity from seatinfo a, playtime b, place_detail c "
 					+ "where a.ping_num = b.ping_num and b.ping_num = "
-					+ "(select ping_num from playing where nc_code = concat('mo',?) and p_code = ?) and b.play_day = date_format(?,'%Y%m%d') and c.p_code = ? order by 1";
+					+ "(select ping_num from playing where nc_code = concat('mo',?) and p_code = ?) and b.play_day = date_format(?,'%Y%m%d') and c.p_code = ? order by 1, 2";
 			pstmt=con.prepareStatement(sql);
 			pstmt.setString(1, mo_num);
 			pstmt.setString(2, pcode);
@@ -455,4 +455,45 @@ public class ReservationDAO {
 		}
 	return null;
 	}
+	
+	//reservation 첫 화면에서 날짜 정보 조회
+		public Map<String, Object> getSeatMap(String pcode) throws Exception{
+			Connection con= null;
+			PreparedStatement pstmt = null;
+			String sql="";
+			ResultSet rs = null;
+			Map<String, Object> resultMap = new HashMap<>();
+			
+			try{
+				con=getConnection();
+				
+				sql="select totalrowcount, rowgroupcount, rowgroupseatcount, colgroupcount, colgrouprowcount, vipscope, rscope, sscope "
+						+ "from seatmap where p_code = ?";
+				pstmt=con.prepareStatement(sql);
+				pstmt.setString(1, pcode);
+				rs = pstmt.executeQuery();
+
+				if(rs.next()){
+					do{
+						resultMap.put("totalrowcount", rs.getInt("totalrowcount"));
+						resultMap.put("rowgroupcount", rs.getInt("rowgroupcount"));
+						resultMap.put("rowgroupseatcount", rs.getString("rowgroupseatcount"));
+						resultMap.put("colgroupcount", rs.getInt("colgroupcount"));
+						resultMap.put("colgrouprowcount", rs.getString("colgrouprowcount"));
+						resultMap.put("vipscope", rs.getString("vipscope"));
+						resultMap.put("rscope", rs.getString("rscope"));
+						resultMap.put("sscope", rs.getString("sscope"));
+						
+					}while(rs.next());
+				}
+				return resultMap;
+						
+			}catch(Exception e){
+				System.out.println("ReserDAO selectPlayday error : "+e);
+			}finally{
+				if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+				if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+			}
+		return null;
+		}
 }

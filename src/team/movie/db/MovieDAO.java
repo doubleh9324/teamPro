@@ -21,14 +21,29 @@ public class MovieDAO {
 		con=ds.getConnection();
 		return con;
 	}
+	
+	//영화 목록을 가져올때 현재 날짜이전에 상영이 끝나는 영화들은 playing 테이블에서 삭제 후 movie 테이블 수정하기
 	public Vector<MovieBean> playingMovies(){
 		Vector<MovieBean> v= new Vector<MovieBean>();
 		Connection con=null;
 		PreparedStatement pstmt = null;
+		PreparedStatement prepstmt = null;
+		PreparedStatement prepstmt2 = null;
 		ResultSet rs=null;
 		String sql="";
+		String presql="";
+		String presql2="";
 		try{
 			con=getConnection();
+			
+			//playing.end_day가 오늘보다 이전이면 movie table.playing set 0
+			presql = "update movie a left join playing b on(a.movie_num = substring(b.nc_code, 3)) set a.playing = 0 where b.end_day < curdate()";
+			prepstmt=con.prepareStatement(presql);
+			prepstmt.executeUpdate();
+			presql2 = "delete from playing where end_day < curdate()";
+			prepstmt2=con.prepareStatement(presql2);
+			prepstmt2.executeUpdate();
+			
 			sql="select m1.movie_num, m1.name, m1.open_day, m2.image, m1.age from movie m1,movie_detail m2 where playing = 1  and m1.movie_num = m2.movie_num";
 			pstmt=con.prepareStatement(sql);
 			rs=pstmt.executeQuery();
@@ -47,6 +62,8 @@ public class MovieDAO {
 		}finally{
 			if(rs!=null){try{rs.close();}catch(Exception e){e.printStackTrace();}}
 			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(pstmt!=null){try{prepstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(pstmt!=null){try{prepstmt2.close();}catch(Exception e){e.printStackTrace();}}
 			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
 		}
 		return v;

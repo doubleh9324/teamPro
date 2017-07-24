@@ -36,8 +36,7 @@ $(document).ready(function(){
  * 	상영관 > (선택시 날짜, 영화 모두 세팅) 다음 영화 눌렀을 때 날짜 설정 완료 / 다음 날짜 눌렀을 때 설정 완료
  * 	날짜 > (선택시 날짜, 영화 모두 세팅) 다음 영화 눌렀을 때 날짜 
  * 
- * 
- * @param event
+ * dimmed랑 disabled 클릭을 좀 막자
  */
 
 /*===================================================
@@ -852,6 +851,22 @@ function setTime(){
         		
         	});
         	addList.append(str);
+        	
+        	//오늘 상영 중 시간대가 현재 시간보다 이전이면 dimmed 클래스 추가하기
+        	
+        	//선택된 date가 오늘일때만
+        	var today = $(".date-list > ul > div > li[data-index='1']").attr("date");
+        	if(playday == today){
+	        	var gettime = new Date();
+	        	var now = gettime.getHours().toString()+gettime.getMinutes().toString();
+	        	
+	        	$(".time-list .theater > ul > li").each(function(i){
+	        		var time = $(this).attr("play_start_tm");
+	        		if(now.localeCompare(time)==1){
+	        			$(this).addClass("disabled");
+	        		}
+	        	});
+        	}
         },
         complete : function(data) {
               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
@@ -879,7 +894,21 @@ function screenTimeClickListener(event){
 	$("#tnb_step_btn_right").addClass("on");
 	
 }
-
+/*====================================================================
+ * 이전단계 버튼
+ */
+function OnTnbLeftClick(){
+	
+	
+	//레이어 옮기기, bottom bar 수정, 버튼 on 제거
+	$(".step.step2").css("display", "none");
+	$(".tnb.step2").removeClass("step2").addClass("step1");
+	$(".step1").css("display", "block");
+	$("#tnb_step_btn_right").addClass("on")
+	
+	
+	
+}
 /*====================================================================
  * 좌석선택 넘어가기 버튼
  */
@@ -909,6 +938,7 @@ function OnTnbRightClick(){
 		
 		var dateInfo = "<b>"+$(".row.date > span.data").text() + "</b> <b class='exe'>("+$(".date-list > ul > div > li.selected > a > span.dayweek").text()
 						+")</b><b> "+$(".time-list .theater > ul > li.selected > a > span.time > span").text() + "</b>";
+		$(".playYMD-info").empty();
 		$(".playYMD-info").append(dateInfo);
 		//시간
 		$(".time-list .theater > ul > li.selected > a > span.time > span").text();
@@ -921,7 +951,8 @@ function OnTnbRightClick(){
 		$(".section-seat").addClass("dimmed");
 		
 		//좌석표 뿌리기
-		
+		var pcode = $(".area_theater_list > ul > li[class*='selected']").attr("p_code");
+		getSeatMap(pcode);
 	}
 }
 
@@ -941,4 +972,317 @@ $(document).on("click",".group.adult > ul > li ", function(){
 	
 	$(".section-seat").removeClass("dimmed");
 });
+
+/*========================================================================
+ * 좌석표 구성하기
+ */
+//한 종류 영화관에 관 좌석 수가 같아서 일단 pcode만 받기
+function getSeatMap(pcode){
+	// 좌석 수 받아와서 좌석표 뿌려주기
+	$("#seats_list > div").empty();
+	
+	jQuery.ajax({
+        type:"POST",
+        url:"./getSeatMap.rs",
+        data:"pcode="+pcode,
+        dataType:"JSON",
+        success : function(data) {
+        	//좌석표 정보를 전달받으면
+        	
+        	var TotalRowCount = data.seatMap.totalrowcount;
+        	var RowGroupCount = data.seatMap.rowgroupcount;
+        	//각 열의 구분은 _ 열안의 값 구분은 , 지금은 모든 열의 갯수가 같아서 나중에 수정 할 것
+        	//(_기준으로 나눈 후에) 잘라서 배열의 한 열에 넣을 것
+        	var temp = (data.seatMap.rowgroupseatcount.toString()).split("_");
+        	var RowGroupSeatCount = new Array();
+	        	for(var a=0; a<TotalRowCount; a++){
+	        		RowGroupSeatCount[a] = temp.toString().split(",");
+	        	}
+        	var ColGroupCount = data.seatMap.colgroupcount;
+        	var ColGroupRowCount = (data.seatMap.colgrouprowcount.toString()).split(",");
+        	
+        	//vipscope
+        	var vipScope = new Array();
+        	temp = (data.seatMap.vipscope.toString()).split("_");
+        		for(var v =0; v<temp.length; v++){
+        			vipScope[v] = temp[v].toString().split(",");
+        		}
+        		
+	    	//rscope
+	    	var rScope = new Array();
+	    	temp = (data.seatMap.rscope.toString()).split("_");
+	    		for(var r =0; r<temp.length; r++){
+	    			rScope[r] = temp[r].toString().split(",");
+	    		}
+	    		
+	    	//sscope
+	    	var sScope = new Array();
+	    	temp = (data.seatMap.sscope.toString()).split("_");
+	    		for(var s =0; s<temp.length; s++){
+	    			sScope[s] = temp[s].toString().split(",");
+	    		}
+    	
+        	
+        	//열 이름 배열
+        	var RowNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "N", "M", "O", "P", "Q", "R", "S", "T", "U"];
+        	//열 이름 배열 인덱스
+        	var RowNameIndex = 0;
+        	//하나의 열 결과 텍스트
+        	var RowStr = "";
+        	//하나의 열에 속한 좌석 결과 텍스트
+        	var RowSeatsStr = "";
+        	//열 간격 top px값
+        	var pxTop=0;
+        	//행 간격 data-left px값
+        	var pxLeft=0;
+        	//열 간격
+        	var top=16;
+        	//행 간격
+        	var left=16;
+        	
+
+        	//하나의 열에 총 좌석 갯수
+        	
+        	var RowSeatCount=0;
+        	
+        	var rindex = 0;
+        	
+        	//열 시작 div
+        	var startDiv="";
+        	//열 끝 div
+        	var endDiv="";
+        	
+        	var isFirstCol = true;
+        	var sindex = 0;
+        	var rowRe = "";
+        	//총 열의 갯수동안
+        	for(var r=0 ; r<TotalRowCount; r++){
+        		var isFirstCol = true;
+        		RowSeatCount=0;
+        		//가로그룹 갯수만큼 반복하면서 한 열의 총 좌석 수 구하기
+        		for(var sc=0; sc < RowGroupCount; sc++){
+        			RowSeatCount += RowGroupSeatCount[r][sc];
+        		}
+        		
+        		pxLeft=0;
+        		//열
+        		RowStr = "<div class='row' style='top:"+pxTop+"px'>"+
+        					"<div class='label'>"+RowNames[RowNameIndex]+"</div>";
+        		pxLeft = pxLeft + left; 
+        		//가로그룹이 두개라면 첫번째 가로그룹의 좌석을 붙인 후 (RowGroupSeatCount의 두번째 값)
+        		//pxLeft값을 한번 더 더해주기
+        		pxTop = pxTop + top;
+        		RowNameIndex++;
+        		RowSeatsStr="";
+        		
+        		var colSeats = new Array();
+        		var i=1;
+        		for(sc=0; sc < RowGroupCount; sc++){
+        			//첫번째 가로그룹엔 left 클래스 추가
+        				if(isFirstCol){
+        					startDiv = "<div class='seat_group left'><div class='group'>";
+        				}else{
+        					startDiv = "<div class='seat_group'><div class='group'>";
+        				}
+        				sindex=0;
+        				while( sindex < parseInt(RowGroupSeatCount[r][sc]) ){
+        					//window.alert(parseInt(RowGroupSeatCount[r][sc]));
+        					RowSeatsStr += "<div class='seat' style='left:"+pxLeft+"px' data-left='"+pxLeft+"' data-index='"+i+"'>"+
+        					"<a href='#' onclick='return false;'>"+
+        						"<span class='no'></span>"+
+        						"<span class='sreader'></span>"+
+        						"<span class='sreader mod'></span>"+
+        					"</a>"+
+        					"</div>";
+        					pxLeft = pxLeft + left;
+        					sindex ++;
+        					i++;
+        				}
+        				//하나의 가로그룹 좌석 열이 다 붙으면
+        				rowRe += startDiv + RowSeatsStr+"</div></div>";
+        				isFirstCol = false;
+        				RowSeatsStr = "";
+        				pxLeft = pxLeft + left;
+        		}
+        		$("#seats_list > .rows").append(RowStr +rowRe +"</div></div>");
+        		rowRe = "";
+        		i=1;
+        		
+        	}
+        	
+        	
+        	//좌석을 다 붙이고나면  세로그룹 대로 재배치
+        	//세로그룹 나누기
+        	var findr = false;
+        	var firstrow = 0;
+        	var col = 0;
+        	 for(var cgc=0; cgc<ColGroupCount; cgc++){
+        		 col += ColGroupRowCount[cgc]*1;
+        		$("#seats_list div .row .label").each(function(){
+        				
+        	
+        				 if($(this).text() == RowNames[col]){
+        		
+        					 findr = true;
+        					 firstrow = top*col + (cgc*16);
+        					 
+        				 }
+        				 
+        				 if(findr){
+        					 firstrow = firstrow + top;
+        					 $(this).parent().css("top", firstrow);
+        				 }
+        			 
+        		});
+        		firstrow += 16;
+        		findr=false;
+        	 }
+        	 
+        	//좌석 위치 배정 후 감싸고있는 div 크기 정해주기(가운데 정렬)
+        	//지금은 가로로 좌석 갯수가 같아서 쓰던걸 가져왔는데 나중에 달라지면 max값으로 가져오기
+        	$("#seats_list").css("width", RowSeatCount*(left-1)+(RowGroupCount-1)*(left-1));
+        	
+        	//등급 나누기
+        	for(var ri=0; ri<rScope.length; ri++){
+        		for(var rs=0; rs<rScope[ri].length; rs++){
+        			//첫번째 인수는 열 번호
+        			var rownum = rScope[ri][0]-1;
+        			
+        			
+        			if(rScope[ri].length > 1){
+	        			//시작 좌석 번호
+	        			var s = rScope[ri][1]-1;
+	        			//끝 좌석 번호
+	        			var e = rScope[ri][2]-1;
+	        			
+	        			$("#seats_list > .rows > .row:eq("+rownum+") .seat").each(function(i){
+	        				if(s<=i && i<=e){
+	        					$(this).addClass("rating_r");
+	        					$(this).find(".sreader").not(".sreader.mod").text("R");
+	        				}
+	        			});
+	    			}else {
+	    				//없으면 열  전체
+	    				$("#seats_list > .rows > .row:eq("+rownum+") .seat").each(function(){
+	        					$(this).addClass("rating_r");
+	        					$(this).find(".sreader").not(".sreader.mod").text("R");
+	        			});
+	    			}
+        		}
+        	}
+        	for(var si=0; si<sScope.length; si++){
+        		for(var ss=0; ss<sScope[si].length; ss++){
+        			//첫번째 인수는 열 번호
+        			var rownum = sScope[si][0]-1;
+        			
+        			if(sScope[si].length > 1){
+	        			//시작 좌석 번호
+	        			var s = sScope[si][1]-1;
+	        			//끝 좌석 번호
+	        			var e = sScope[si][2]-1;
+	        			
+	        			$("#seats_list > .rows > .row:eq("+rownum+") .seat").each(function(i){
+	        				if(s<=i && i<=e){
+	        					$(this).addClass("rating_s");
+	        					$(this).find(".sreader").not(".sreader.mod").text("S");
+	        				}
+	        			});
+	    			}else {
+	    				//없으면 열  전체
+	    				$("#seats_list > .rows > .row:eq("+rownum+") .seat").each(function(){
+	        					$(this).addClass("rating_s");
+	        					$(this).find(".sreader").not(".sreader.mod").text("S");
+	        			});
+	    			}
+        		}
+        	}
+        	for(var vi=0; vi<vipScope.length; vi++){
+        		for(var vs=0; vs<vipScope[vi].length; vs++){
+        			//첫번째 인수는 열 번호
+        			var rownum = vipScope[vi][0]-1;
+        			
+        			if(vipScope[vi].length > 1){
+        				//시작, 끝 번호가 있을때만
+        				
+	        			//시작 좌석 번호
+	        			var s = vipScope[vi][1]-1;
+	        			//끝 좌석 번호
+	        			var e = vipScope[vi][2]-1;
+	        			
+	        			$("#seats_list > .rows > .row:eq("+rownum+") .seat").each(function(i){
+	        				if(s<=i && i<=e){
+	        					$(this).addClass("rating_vip");
+	        					$(this).find(".sreader").not(".sreader.mod").text("VIP");
+	        				}
+	        			});
+        			}else {
+        				//없으면 열  전체
+        				$("#seats_list > .rows > .row:eq("+rownum+") .seat").each(function(){
+	        					$(this).addClass("rating_vip");
+	        					$(this).find(".sreader").not(".sreader.mod").text("VIP");
+	        			});
+        			}
+        		}
+        	}
+        	
+        
+        },
+        complete : function(data) {
+              // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
+        },
+        error : function(xhr, status, error) {
+              alert("에러발생");
+        }
+ 	 });
+}
+
+/*======================================================================
+ * 좌석 선택
+ */
+$(document).on("click",".seat_group > div > .seat > a", function(i){
+	
+	var num = $(".numberofpeople-select ul li.selected").attr("data-count");
+	//선택하지 않은 좌석들 클래스 제거
+	//일단 한좌석만
+	if($(".seat_group > div > .seat").hasClass("selected")){
+		//다음 요소부터 num개만큼 선택을 위해서 하나 뒤로
+		var selectLi = $(this).parent().prev();
+		var re = window.confirm("이미 선택된 좌석이 있습니다. 변경하시겠습니까?");
+		
+		if(re){
+			$(".seat_group > div > .seat").removeClass("selected");
+			
+			for(var n=0; n<num; n++){
+				if(n==0)
+					$(this).parent().addClass("selected");
+				else
+					$(this).parent().next().addClass("selected");
+			}
+		}
+	}else{
+		for(var n=0; n<num; n++){
+			if(n==0)
+				$(this).parent().addClass("selected");
+			else
+				$(this).parent().next().addClass("selected");
+		}
+	}
+	
+	//bottom bar 설정하기
+	//글씨 모두 살리기
+	$(".info.seat div").css("display", "block");
+	//좌석 선택 글씨 none
+	$("div[class='placeholder'][title='좌석선택'] ").css("display","none");
+	
+	//좌석이름지정
+	$(".info.seat > .row.seat_name > .data").text($("#seats_list > .rows > .row .seat.selected:eq(0)" ).find(".sreader").text());
+	var seats = "";
+	//좌석 지정
+	$(".seat_group > div > .seat.selected").each(function(i){
+		seats += $(this).attr("data-index") +  $(this).parents(".row").find(".label").text()+ " ";
+	});
+	$(".info.seat > .row.seat_no > .data").text(seats);
+});
+
+
 

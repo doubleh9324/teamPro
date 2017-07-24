@@ -90,6 +90,13 @@ public class ReservationFrontController extends HttpServlet{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}else if(command.equals("/getSeatMap.rs")){
+			action = new ReserSeatMapSelectAction();
+			try {
+				forward= action.execute(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		

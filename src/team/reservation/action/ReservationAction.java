@@ -1,7 +1,5 @@
 package team.reservation.action;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +22,6 @@ public class ReservationAction implements Action{
 		//예매화면 띄우기
 		//상영하는 영화, 영화관, 상영시간
 		MovieDAO movieDao = new MovieDAO();
-		PlaceDAO placeDao = new PlaceDAO();
-		PlayingDAO playingDao = new PlayingDAO();
 		ReservationDAO reserDao = new ReservationDAO();
 		
 		//한영화가 상영하는 극장과 관, 상영시간
