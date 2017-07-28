@@ -176,11 +176,6 @@
 		
 		<button onclick="reservation();">예매하기</button>
 		
-		<form action="./PlayingInsertAction.pg" method="post">
-		
-		
-		</form>
-		
 	
 <script type="text/javascript">
 
@@ -218,8 +213,6 @@ $(document).ready(function(){
 
          },
          complete : function(data) {
-               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-               // TODO
          },
          error : function(xhr, status, error) {
                alert("에러발생");
@@ -234,8 +227,6 @@ $(document).ready(function(){
 	    		$("#ping_num").val(data.pnumMax);
          },
          complete : function(data) {
-               // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-               // TODO
          },
          error : function(xhr, status, error) {
                alert("에러발생");

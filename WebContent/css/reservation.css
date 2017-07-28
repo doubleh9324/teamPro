@@ -475,7 +475,7 @@ a:hover{text-decoration: none;}
 #ticket .section-seat .theater .seats .row .seat.eggbox 	a .no{background-color:transparent; background-position:-275px 0; 	background-image:url(http://img.cgv.co.kr/CGV_RIA/Ticket/image/reservation/step2/seat_icons_new2.png); }
 
 #ticket .section-seat .theater .seats .row .seat.notavail 	a .no{background-color:#bbb;		background-position:-25px 0;	background-image:url(http://img.cgv.co.kr/CGV_RIA/Ticket/image/reservation/step2/seat_icons_new2.png); }
-#ticket .section-seat .theater .seats .row .seat.reserved 	a .no{background-color:#bbb;		background-position:-1000px 0;	background-image:url(http://img.cgv.co.kr/CGV_RIA/Ticket/image/reservation/step2/seat_icons_new2.png); }
+#ticket .section-seat .theater .seats .row .seat.reserved 	a .no{background-color:#bbb;		background-position:-1000px 0;	}
 #ticket .section-seat .theater .seats .row .seat.preselect	a .no{background-color:#ad1712; 	background-position:0 0;		background-image:url(http://img.cgv.co.kr/CGV_RIA/Ticket/image/reservation/step2/seat_icons_new2.png); }
 #ticket .section-seat .theater .seats .row .seat.selected 	a .no{border:black 3px solid; box-sizing:border-box; background-position:0 0;}
 

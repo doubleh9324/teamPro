@@ -14,6 +14,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import com.mysql.jdbc.Statement;
+
 import team.movie.db.MovieBean;
 
 public class ReservationDAO {
@@ -457,43 +459,227 @@ public class ReservationDAO {
 	}
 	
 	//reservation 첫 화면에서 날짜 정보 조회
-		public Map<String, Object> getSeatMap(String pcode) throws Exception{
-			Connection con= null;
-			PreparedStatement pstmt = null;
-			String sql="";
-			ResultSet rs = null;
-			Map<String, Object> resultMap = new HashMap<>();
+	public Map<String, Object> getSeatMap(String pcode) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		try{
+			con=getConnection();
 			
-			try{
-				con=getConnection();
-				
-				sql="select totalrowcount, rowgroupcount, rowgroupseatcount, colgroupcount, colgrouprowcount, vipscope, rscope, sscope "
-						+ "from seatmap where p_code = ?";
-				pstmt=con.prepareStatement(sql);
-				pstmt.setString(1, pcode);
-				rs = pstmt.executeQuery();
+			sql="select totalrowcount, rowgroupcount, rowgroupseatcount, colgroupcount, colgrouprowcount, vipscope, rscope, sscope, vacantseat "
+					+ "from seatmap where p_code = ?";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, pcode);
+			rs = pstmt.executeQuery();
 
-				if(rs.next()){
-					do{
-						resultMap.put("totalrowcount", rs.getInt("totalrowcount"));
-						resultMap.put("rowgroupcount", rs.getInt("rowgroupcount"));
-						resultMap.put("rowgroupseatcount", rs.getString("rowgroupseatcount"));
-						resultMap.put("colgroupcount", rs.getInt("colgroupcount"));
-						resultMap.put("colgrouprowcount", rs.getString("colgrouprowcount"));
-						resultMap.put("vipscope", rs.getString("vipscope"));
-						resultMap.put("rscope", rs.getString("rscope"));
-						resultMap.put("sscope", rs.getString("sscope"));
-						
-					}while(rs.next());
-				}
-				return resultMap;
-						
-			}catch(Exception e){
-				System.out.println("ReserDAO selectPlayday error : "+e);
-			}finally{
-				if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
-				if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+			if(rs.next()){
+				do{
+					resultMap.put("totalrowcount", rs.getInt("totalrowcount"));
+					resultMap.put("rowgroupcount", rs.getInt("rowgroupcount"));
+					resultMap.put("rowgroupseatcount", rs.getString("rowgroupseatcount"));
+					resultMap.put("colgroupcount", rs.getInt("colgroupcount"));
+					resultMap.put("colgrouprowcount", rs.getString("colgrouprowcount"));
+					resultMap.put("vipscope", rs.getString("vipscope"));
+					resultMap.put("rscope", rs.getString("rscope"));
+					resultMap.put("sscope", rs.getString("sscope"));
+					resultMap.put("vacantseat", rs.getString("vacantseat"));
+				}while(rs.next());
 			}
-		return null;
+			return resultMap;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO selectPlayday error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
 		}
+	return null;
+	}
+	
+	public int getPingnum(String pcode, String mo_num) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		int pingnum = 0;
+		
+		try{
+			con=getConnection();
+			
+			sql="select ping_num from playing where p_code = ? and nc_code = concat('mo',?) ";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, pcode);
+			pstmt.setString(2,mo_num);
+			rs = pstmt.executeQuery();
+
+			if(rs.next()){
+				pingnum = rs.getInt(1);
+			}
+			return pingnum;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO getpingnum error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+	return 0;
+	}
+	
+	public ReservationBean insertReservation(ReservationBean rsb) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		PreparedStatement nextpstmt = null;
+		String sql="";
+		String nextSql = "";
+		ResultSet rs = null;
+		ReservationBean reRsb = new ReservationBean();
+		int renum = 0;
+		
+		
+		try{
+			con=getConnection();
+			
+			sql="insert into reservation "
+				+ "(member_num, ping_num, rseat_num, seat, view_date, reser_day, pay_day, screen_name, mPoint, price) "
+				+ "values ( ?,?,?,?,?,now(),now(),?,?,?)";
+			pstmt=con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			pstmt.setInt(1, rsb.getMember_num());
+			pstmt.setInt(2, rsb.getPing_num());
+			pstmt.setString(3, rsb.getReseat_num());
+			pstmt.setString(4, rsb.getSeat());
+			pstmt.setString(5, rsb.getView_date());
+			pstmt.setString(6, rsb.getScreen_name());
+			pstmt.setInt(7, rsb.getMPoint());
+			pstmt.setInt(8,  rsb.getPrice());
+			
+			pstmt.executeUpdate();
+			rs = pstmt.getGeneratedKeys();
+			
+			if(rs.next()){
+				renum = rs.getInt(1);
+			}
+			
+			int i=0;
+			int result=0;
+
+			//몇명을 예매했는지 count 구해오기
+
+			while(i<(rsb.getReseat_num()).length()) {
+				
+				   if((rsb.getReseat_num()).charAt(i)>=47 &&  (rsb.getReseat_num()).charAt(i)<=58) {
+				    result += Integer.parseInt((rsb.getReseat_num()).substring(i,i+1));
+					
+				   }
+				   i++;
+			}
+			
+			String[] seats = rsb.getSeat().split(" ");
+			
+			for(int s=0; s<result; s++){
+				nextpstmt = null;
+				nextSql = "insert into reserved_seat (r_num, ping_num, screen_name, seat, view_date)"+
+						"values (?,?,?,?,?)";
+				nextpstmt = con.prepareStatement(nextSql);
+				nextpstmt.setInt(1, renum);
+				nextpstmt.setInt(2, rsb.getPing_num());
+				nextpstmt.setString(3, rsb.getScreen_name());
+				nextpstmt.setString(4, seats[s]);
+				nextpstmt.setString(5, rsb.getView_date());
+				
+				nextpstmt.executeUpdate();
+			}
+
+			return reRsb;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO insertReservation error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(nextpstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+	return null;
+	}
+	
+	public List<Map<String, Object>> getReservedSeats(int pingnum, String screen_name, String viewdate) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		List<Map<String, Object>> rvedseatList = new ArrayList<>();
+		
+		try{
+			con=getConnection();
+			
+			sql="select seat from reserved_seat where ping_num = ? and screen_name = ? and view_date = ?";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setInt(1, pingnum);
+			pstmt.setString(2, screen_name);
+			pstmt.setString(3, viewdate);
+			rs = pstmt.executeQuery();
+			
+			System.out.println(pstmt.toString());
+			if(rs.next()){
+				do{
+					Map<String, Object> resultmap = new HashMap<>();
+					String seat = rs.getString("seat");
+					resultmap.put("seat_fl", seat.substring(0,1));
+					resultmap.put("seat_no", seat.substring(1));
+					rvedseatList.add(resultmap);
+				}while(rs.next());
+			}
+			
+			return rvedseatList;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO reservedseat error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+	return null;
+	}
+	
+	public List<Map<String, Object>> getCheckedSeats(int pingnum, String screen_name, String viewdate) throws Exception{
+		Connection con= null;
+		PreparedStatement pstmt = null;
+		String sql="";
+		ResultSet rs = null;
+		List<Map<String, Object>> ckedseatList = new ArrayList<>();
+		
+		try{
+			con=getConnection();
+			
+			sql="select seat from checked_seat where ping_num = ? and screen_name = ? and view_date = ? ";
+			pstmt=con.prepareStatement(sql);
+			pstmt.setInt(1, pingnum);
+			pstmt.setString(2, screen_name);
+			pstmt.setString(3, viewdate);
+			rs = pstmt.executeQuery();
+			System.out.println(pstmt.toString());
+			if(rs.next()){
+				do{
+					Map<String, Object> resultmap = new HashMap<>();
+					String seat = rs.getString("seat");
+					resultmap.put("seat_fl", seat.substring(0,1));
+					resultmap.put("seat_no", seat.substring(1));
+					ckedseatList.add(resultmap);
+				}while(rs.next());
+			}
+			
+			return ckedseatList;
+					
+		}catch(Exception e){
+			System.out.println("ReserDAO checkedseat error : "+e);
+		}finally{
+			if(pstmt!=null){try{pstmt.close();}catch(Exception e){e.printStackTrace();}}
+			if(con!=null){try{con.close();}catch(Exception e){e.printStackTrace();}}
+		}
+	return null;
+	}
+	
 }
